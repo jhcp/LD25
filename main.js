@@ -17,7 +17,7 @@ function generateWorld()
 
             //place grass on all tiles
             grassType = Crafty.math.randomInt(1, 4);
-            Crafty.e("2D, DOM, grass" + 1)
+            Crafty.e('2D, DOM, grass' + 1)
                 .attr({ x: i * tileSize, y: j * tileSize, z:1 });
         }
     }
@@ -63,21 +63,20 @@ window.onload = function ()
 
 function createPlayer(x, y)
 {
-  player = Crafty.e("2D, DOM, joe, Twoway, Ape, Gravity")
+  player = Crafty.e('2D, DOM, joe, Twoway, Collision, WiredHitBox, Gravity,     Ape, AxeAttacker')
     .attr({ x: x * 32, y: y * 32, z:1000 })
     .twoway(1, 0)
-    .gravity("grass1")
+    .gravity('grass1')
     .gravityConst(.1)
     ;
-    
-    //player.stop().animate("walk_left", 10, -1);
 }
 
 function createTree()
 {
-  Crafty.e("2D, DOM, Tree, tree1, Tweener")
+  Crafty.e('2D, DOM, tree1, Tweener, Collision, WiredHitBox,       Tree')
     .attr({ x: 250, y: 200, z:500 })
-    .origin("bottom center")
-    .trigger("Bounce")
+    .origin('bottom center')
+    .collision([62,150], [102,150], [102,212], [62,212])
+    //.trigger('Bounce')
     ;
 }

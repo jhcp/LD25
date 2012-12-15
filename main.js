@@ -30,6 +30,26 @@ window.onload = function ()
   initializeGameComponents();
 
 
+  Crafty.scene('loading', function ()
+  {
+    Crafty.background('rgb(30,30,30)');
+    var loadingText = Crafty.e('2D, DOM, Text')
+      .attr({ w: 480, h: 20, x: 0, y: 20 })
+      .text('Loading...')
+      .css({ 'text-align': 'center' });
+
+    Crafty.load(getImagesToLoad(), function ()
+    {
+      setupImages();
+      loadingText.destroy();
+
+      Crafty.scene('level1');
+    });
+    
+
+  });
+  Crafty.scene('loading');
+
   Crafty.scene('level1', function ()
   {
     Crafty.background('white');
@@ -40,7 +60,7 @@ window.onload = function ()
   });
   
 
-  Crafty.scene('level1');
+
 
   Crafty.scene('gameOver', function ()
   {
@@ -63,7 +83,7 @@ window.onload = function ()
 
 function createPlayer(x, y)
 {
-  player = Crafty.e('2D, DOM, joe, Twoway, Collision, WiredHitBox, Gravity,     Ape, AxeAttacker')
+  player = Crafty.e('2D, DOM, joe, Twoway, Collision, Gravity,     Ape, AxeAttacker')
     .attr({ x: x * 32, y: y * 32, z:1000 })
     .twoway(1, 0)
     .gravity('grass1')
@@ -73,7 +93,7 @@ function createPlayer(x, y)
 
 function createTree()
 {
-  Crafty.e('2D, DOM, tree1, Tweener, Collision, WiredHitBox,       Tree')
+  Crafty.e('2D, DOM, tree1, Tweener, Collision,       Tree')
     .attr({ x: 250, y: 200, z:500 })
     .origin('bottom center')
     .collision([62,150], [102,150], [102,212], [62,212])

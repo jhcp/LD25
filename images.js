@@ -23,6 +23,18 @@ var  images =
     }
   };
 
+function getImagesToLoad()
+{
+  var toLoad = new Array();
+  for (var i = 0; i < images.baseTiles.length; i++) toLoad.push(images.baseTiles[i].file);
+  //for (var i = 0; i < images.enemySprites.length; i++) toLoad.push(images.enemySprites[i].file);
+  toLoad.push(images.trees.tree2);
+  toLoad.push(images.player.sprite);
+//  toLoad.push(images.other.hpBg);toLoad.push(images.other.hpFg);
+  
+  return toLoad;
+}
+
 function setupImages()
 {
   Crafty.sprite(32, images.baseTiles[0].file, {

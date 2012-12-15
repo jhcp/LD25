@@ -8,11 +8,19 @@
   <meta name="author" content="João Pimentel">
 
   <style type="text/css">
+    @font-face {
+      font-family: 'Press Start 2P';
+      font-style: normal;
+      font-weight: 400;
+      src: local('Press Start 2P'), local('PressStart2P-Regular'), url(assets/fonts/pressStart2P.woff) format('woff');
+    }
+
     body, html
     {
       margin:0;
       padding: 0;
       overflow:hidden;
+      font-family: 'Press Start 2P', cursive;
       font-size:12px;
       background-color:black;
       color:white;
@@ -33,6 +41,15 @@
     {
       color:rgb(230, 230, 230);
     }
+    
+
+    #pointsHUD
+    {
+      font-size:26px;
+      color:yellow;
+      margin-left:-500px;
+      margin-top:50px;
+    }
 
   </style>
 
@@ -40,8 +57,12 @@
 
 <body>
 
-<br /><br />
 <center>
+
+<div id="pointsHUD"><img src="assets/images/smallTree 2x.png" />
+   <span id="points">0</span></div>
+
+
 <div id="cr-stage"></div>
 </center>
 

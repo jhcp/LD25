@@ -6,11 +6,11 @@ var  images =
     ],
     'trees':
     {
-      'tree2': 'assets/images/tree2.png',
+      'tree1': 'assets/images/tree2.png',
     },
     'enemySprites':
     [
-      {'name': 'native', 'file': 'assets/images/native.png'},
+      {'name': 'nativeMan', 'file': 'assets/images/native.png'},
     ],
     'player':
     {
@@ -27,8 +27,8 @@ function getImagesToLoad()
 {
   var toLoad = new Array();
   for (var i = 0; i < images.baseTiles.length; i++) toLoad.push(images.baseTiles[i].file);
-  //for (var i = 0; i < images.enemySprites.length; i++) toLoad.push(images.enemySprites[i].file);
-  toLoad.push(images.trees.tree2);
+  for (var i = 0; i < images.enemySprites.length; i++) toLoad.push(images.enemySprites[i].file);
+  toLoad.push(images.trees.tree1);
   toLoad.push(images.player.sprite);
 //  toLoad.push(images.other.hpBg);toLoad.push(images.other.hpFg);
   
@@ -38,12 +38,15 @@ function getImagesToLoad()
 function setupImages()
 {
   Crafty.sprite(32, images.baseTiles[0].file, {
-    grass1: [0, 0],
+    grass2: [0, 0],
   });
-  Crafty.sprite(131, 212, images.trees.tree2, {
+  Crafty.sprite(131, 212, images.trees.tree1, {
     tree1: [0, 0],
   });
   Crafty.sprite(64, images.player.sprite, {
     joe: [0, 0],
+  });
+  Crafty.sprite(64, images.enemySprites[0].file, {
+    nativeMan: [0, 0],
   });
 }

@@ -1,7 +1,7 @@
 var testingMode = false;
 
 //stage variables
-var stageWidth = 20;
+var stageWidth = 26;
 var stageHeight = 16;
 var tileSize = 32;
 
@@ -12,7 +12,7 @@ function generateWorld()
 {
     //loop through all tiles
     for (var i = 0; i < stageWidth; i++) {
-        for (var j = 0; j < stageHeight; j++) {
+        for (var j = 13; j < stageHeight; j++) {
 
             //place grass on all tiles
             grassType = Crafty.math.randomInt(1, 4);
@@ -33,22 +33,14 @@ window.onload = function ()
   {
     Crafty.background('white');
     generateWorld();
-    //createPlayer(3,5);
+    createPlayer(6,11);
     
     Crafty.e("2D, DOM, tree, Tweener")
       .attr({ x: 250, y: 200, z:101 })
-      .addTween({rotation: 80}, 'easeOutBounce', 200);
+      .origin("bottom center")
+      .addTween({rotation: 5}, "easeInElastic", 50)   //bounce the tree
+      //.addTween({rotation: 80}, "easeOutBounce", 200);    //tree falls down
 
-    /***********/
-    
-    // Move an object to 650 on x-axis and 1080 degrees on rotation with quadratic transition in 100 frames and
-    // 500 on y-axis with bounce transition in 200 frames.
-        //.addTween({x:650, rotation: 1080}, 'easeInQuad',100)
-//        .addTween({y:500}, 'easeOutBounce',200);
-
-
-
-    /**********/
   });
   
 
@@ -75,8 +67,8 @@ window.onload = function ()
 
 function createPlayer(x, y)
 {
-  Crafty.e("2D, DOM, blob")
-                .attr({ x: x * 64, y: y * 64, z:100 });
+  Crafty.e("2D, DOM, joe")
+                .attr({ x: x * 32, y: y * 32, z:100 });
 }
 
 function initializeCraftyComponents()

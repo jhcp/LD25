@@ -31,7 +31,7 @@ function setupImages()
   Crafty.sprite(131, 212, images.trees.tree2, {
     tree: [0, 0],
   });
-  /*Crafty.sprite(64, images.player.sprite, {
-    blob: [0, 0],
-  });*/
+  Crafty.sprite(64, images.player.sprite, {
+    joe: [0, 0],
+  });
 }

@@ -29,7 +29,7 @@ function setupImages()
     grass1: [0, 0],
   });
   Crafty.sprite(131, 212, images.trees.tree2, {
-    tree: [0, 0],
+    tree1: [0, 0],
   });
   Crafty.sprite(64, images.player.sprite, {
     joe: [0, 0],

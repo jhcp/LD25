@@ -7,6 +7,7 @@ var tileSize = 32;
 
 //global state and variables
 var points = 0;
+var player = null;
 
 function generateWorld()
 {
@@ -26,20 +27,15 @@ window.onload = function ()
 {
   Crafty.init(stageWidth*tileSize, stageHeight*tileSize);
   setupImages();
+  initializeGameComponents();
 
-  initializeCraftyComponents();
 
   Crafty.scene('level1', function ()
   {
     Crafty.background('white');
     generateWorld();
+    createTree();
     createPlayer(6,11);
-    
-    Crafty.e("2D, DOM, tree, Tweener")
-      .attr({ x: 250, y: 200, z:101 })
-      .origin("bottom center")
-      .addTween({rotation: 5}, "easeInElastic", 50)   //bounce the tree
-      //.addTween({rotation: 80}, "easeOutBounce", 200);    //tree falls down
 
   });
   
@@ -67,31 +63,21 @@ window.onload = function ()
 
 function createPlayer(x, y)
 {
-  Crafty.e("2D, DOM, joe")
-                .attr({ x: x * 32, y: y * 32, z:100 });
+  player = Crafty.e("2D, DOM, joe, Twoway, Ape, Gravity")
+    .attr({ x: x * 32, y: y * 32, z:1000 })
+    .twoway(1, 0)
+    .gravity("grass1")
+    .gravityConst(.1)
+    ;
+    
+    //player.stop().animate("walk_left", 10, -1);
 }
 
-function initializeCraftyComponents()
+function createTree()
 {
-  Crafty.c('Letter',{init: function()
-  {
-    this
-    .requires('Collision')
-    //.requires('Mouse')
-    .bind('EnterFrame', function ()
-    {
-      //hit floor or roof
-      if (this.y <= 0 || this.y >= stageHeight)
-        this.dY = - this.dY;
-      if (this.x <= 0 || this.x >= stageWidth)
-        this.dX = - this.dX;
-
-      this.x += this.dX;
-      this.y += this.dY;
-
-    })
+  Crafty.e("2D, DOM, Tree, tree1, Tweener")
+    .attr({ x: 250, y: 200, z:500 })
+    .origin("bottom center")
+    .trigger("Bounce")
     ;
-
-      return this;
-  }});
 }

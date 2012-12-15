@@ -22,7 +22,7 @@ function initializeGameComponents()
             if (!this.isPlaying('walk_right'))
               this.stop().animate('walk_right', 10, -1);
           }
-          if(!direction.x && !direction.y)
+          if(!direction.x)
           {
             this.stop();
           }
@@ -45,7 +45,7 @@ function initializeGameComponents()
           if (this.attackCounter > 20)
           {
             if (this.isDown('SPACE')) this.attack();
-          }
+          };
       })
       ;
     }
@@ -93,11 +93,11 @@ function initializeGameComponents()
           this.life--;
           if (this.life>0)
           {
-            //this.addTween({rotation: 2}, 'easeOutElastic', 18, endOfTween, [this])   //bounce the tree
+            //this.addTween({rotation: 2}, 'easeOutElastic', 18, endOfTween, [this])
           }
           else
           {
-            this.addTween({rotation: 80}, 'easeOutBounce', 50, endOfTween, [this]);    //tree falls down
+            this.addTween({rotation: 80}, 'easeOutBounce', 50, endOfTween, [this]);
           }
         })
       ;
@@ -136,7 +136,7 @@ function initializeGameComponents()
             }
             else
             {
-              var targetX, targetY;
+              var targetX;
               if (randomNumber > 7)
               {
                 //targets a random position
@@ -183,32 +183,134 @@ function initializeGameComponents()
       this
         .attr('life', 3)
         .attr('hitCounter', 50)
+        .attr('bouncing', false)
+        .attr('falling', false)
         .bind('EnterFrame', function ()
         {
           this.hitCounter++;
+          
+          if (this.bouncing)
+          {
+            this.rotation = this.easeOutElastic();
+            this.tweenProperties.timeCounter++;
+            if (this.tweenProperties.timeCounter > this.tweenProperties.duration)
+            {
+              this.bouncing = false;
+            }
+          }
+          if (this.falling)
+          {
+            this.rotation = this.easeOutBounce();
+            this.y +=0.5;
+            this.tweenProperties.timeCounter++;
+            if (this.tweenProperties.timeCounter > this.tweenProperties.duration)
+            {
+              this.falling = false;
+            }
+          }
         })
+        .requires('Tweenable')
         .bind('Hit',
           function ()
           {
-            if (this.hitCounter > 55)
+            if (this.hitCounter > 20)
             {
+              Crafty.audio.play("chop");
               this.life--;
               this.hitCounter = 0;
               if (this.life>0)
               {
-                this.addTween({rotation: 2}, 'easeOutElastic', 50, endOfTween, [this])   //bounce the tree
+                this.setTweenProperties(0, 2, 50);
+                this.bouncing = true;
               }
-              else if (this.life==0)
+              else if (this.life==0)   //the tree dies
               {
-                this.addTween({rotation: 80}, 'easeOutBounce', 50, endOfTreeFall, [this]);    //tree falls down
-  
+                this.setTweenProperties(0, 80, 150);
+                this.falling = true;
+
                 increasePoints(1);
-                //endOfTreeAnimation();
+                if (points == 2)
+                {
+                  createArrow();
+                }
+                if (points == 3)
+                {
+                  Crafty.viewport.pan('x', 800, 50);
+                  player.tween({x: 850}, 65);
+                }
               }
             }
           })
         ;
     }});
+    
+    // TTTTTTTTTWEENABLE
+    Crafty.c('Tweenable', {
+    init: function()
+    {
+      this.tweenProperties = { initialValue: 0,
+                               targetValue: 0,
+                               duration: 0,
+                               timeCounter: 0,
+                               
+                               transformationDelta: 0,    //targetValue minus initialValue
+                               timeCounter: 0};
+
+    },
+    setTweenProperties: function(initialValue, targetValue, duration)
+    {
+      this.tweenProperties.initialValue = initialValue;
+      this.tweenProperties.targetValue = targetValue;
+      this.tweenProperties.duration = duration;
+
+      this.tweenProperties.transformationDelta = targetValue - initialValue;
+      this.tweenProperties.timeCounter = 0;
+
+    },
+    
+    easeOutElastic: function(a, p)
+    {
+      var t = this.tweenProperties.timeCounter;
+      var b = this.tweenProperties.initialValue;
+      var c = this.tweenProperties.transformationDelta;
+      var d = this.tweenProperties.duration;
+    
+      if (t === 0) { return b; }
+      if ((t /= d) === 1) { return b + c; }
+      if (!p) { p = d * 0.3; }
+      if (!a) { a = 1; }
+      var s = 0;
+      
+      if (a < Math.abs(c))
+      {
+        a = c;
+        s = p / 4;
+      } else
+      {
+        s = p / (2 * Math.PI) * Math.asin(c / a);
+      }
+      
+      return a * Math.pow(2, -10 * t) * Math.sin((t * d - s) * (2 * Math.PI) / p) + c + b;
+    },
+    easeOutBounce: function () 
+    {
+      var t = this.tweenProperties.timeCounter;
+      var b = this.tweenProperties.initialValue;
+      var c = this.tweenProperties.transformationDelta;
+      var d = this.tweenProperties.duration;
+      if ((t /= d) < (1 / 2.75)) {
+        return c * (7.5625 * t * t) + b;
+      }
+      else if (t < (2 / 2.75)) {
+        return c * (7.5625 * (t -= (1.5 / 2.75)) * t + 0.75) + b;
+      }
+      else if (t < (2.5 / 2.75)) {
+        return c * (7.5625 * (t -= (2.25 / 2.75)) * t + 0.9375) + b;
+      } else {
+	return c * (7.5625 * (t -= (2.625 / 2.75)) * t + 0.984375) + b;
+      }
+    }
+    });
 
 };
 
@@ -219,5 +321,5 @@ function endOfTween(tweenedEntity)
 function endOfTreeFall(tree)
 {
   endOfTween(tree);
-  tree.addTween({alpha: 0}, 'easeInQuad', 100, endOfTween, [tree]);
-}
+  tree.addTween({alpha: 0}, 'easeOutQuad', 80, endOfTween, [tree]);
+};

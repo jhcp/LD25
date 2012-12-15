@@ -14,7 +14,7 @@ var player = null;
 function generateWorld()
 {
     //loop through all tiles
-    for (var i = 0; i < stageWidth; i++) {
+    for (var i = 0; i < stageWidth*2; i++) {
         for (var j = 13; j < 14; j++) {
 
             //place grass on all tiles
@@ -30,7 +30,7 @@ window.onload = function ()
   Crafty.init(stageWidth*tileSize, stageHeight*tileSize);
   setupImages();
   initializeGameComponents();
-
+  Crafty.audio.add("chop", "assets/audio/chop.ogg");
 
   Crafty.scene('loading', function ()
   {
@@ -60,10 +60,13 @@ window.onload = function ()
     createTree(9);
     createTree(13);
     createTree(15);
+    createTree(28);
     createPlayer(6,11);
-    createNative(3,11);
-    createNative(8,11);
-    createNative(14,11);
+    createNative(30,11);
+    createNative(32,11);
+    createNative(33,11);
+
+    Crafty.viewport.clampToEntities = false;
 
   });
   
@@ -91,14 +94,14 @@ window.onload = function ()
 
 function createPlayer(x, y)
 {
-  player = Crafty.e('2D, DOM, joe, Twoway, Collision, Gravity,     Ape, AxeAttacker')
+  player = Crafty.e('2D, DOM, joe, Tween, Twoway, Collision, Gravity,     Ape, AxeAttacker')
     .attr({ x: x * 32, y: y * 32, z:1000 })
     .twoway(3, 5)
-    .collision([22,3], [45,3], [45,62], [22,62])
+    .collision([22,3], [45,3], [45,42], [22,42])
     .gravity('grass1')
     .gravityConst(.3)
     ;
-  
+
   if (collisionBox) player.addComponent('WiredHitBox');
 }
 
@@ -118,13 +121,20 @@ function createNative(x, y)
 function createTree(x)
 {
   var tree = Crafty.e('2D, DOM, tree1, Tweener, Collision,       Tree')
-    .attr({ x: x * 32, y: 200, z:500 })
+    .attr({ x: x * 32, y: 101, z:500 })
     .origin('bottom center')
-    .collision([62,150], [102,150], [102,212], [62,212])
+    .collision([85,250], [160,250], [160,305], [85,305])
     //.trigger('Bounce')
     ;
-    
+
   if (collisionBox) tree.addComponent('WiredHitBox');
+}
+
+function createArrow()
+{
+  Crafty.e('2D, DOM, nextStageArrow')
+    .attr({ x: 680, y: 100, z:1500 })
+    ;
 }
 
 function increasePoints(x)

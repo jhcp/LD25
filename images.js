@@ -10,7 +10,7 @@ var  images =
     },
     'enemySprites':
     [
-      {'name': 'nativeMan', 'file': 'assets/images/native.png'},
+      {'name': 'nativeMan', 'file': 'assets/images/native2.png'},
     ],
     'player':
     {
@@ -19,6 +19,7 @@ var  images =
     'other':
     {
       'arrow': 'assets/images/arrow2x.png',
+      'blood': 'assets/images/blood.png',
     }
   };
 
@@ -29,7 +30,7 @@ function getImagesToLoad()
   for (var i = 0; i < images.enemySprites.length; i++) toLoad.push(images.enemySprites[i].file);
   toLoad.push(images.trees.tree1);
   toLoad.push(images.player.sprite);
-  toLoad.push(images.other.arrow);
+  toLoad.push(images.other.arrow);toLoad.push(images.other.blood);
   
   return toLoad;
 }
@@ -46,11 +47,19 @@ function setupImages()
   Crafty.sprite(128, 64, images.player.sprite, {
     joe: [0, 0],
   });
-  Crafty.sprite(64, images.enemySprites[0].file, {
+  Crafty.sprite(128, 64, images.enemySprites[0].file, {
     nativeMan: [0, 0],
   });
   
   Crafty.sprite(98, 52, images.other.arrow, {
     nextStageArrow: [0, 0],
+  });
+  Crafty.sprite(41, 30, images.other.blood, {
+    blood1: [0, 0],
+    blood2: [1, 0],
+    blood3: [2, 0],
+    blood4: [3, 0],
+    blood5: [4, 0],
+    blood6: [5, 0],
   });
 }

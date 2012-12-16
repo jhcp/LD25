@@ -5,6 +5,7 @@ function initializeGameComponents()
   {
     init: function()
     {
+      this.facingRight = true;
       //setup animations
       this.requires('SpriteAnimation')
       .animate('walk_left', 0, 1, 0)
@@ -15,11 +16,13 @@ function initializeGameComponents()
         {
           if (direction.x < 0)
           {
+            this.facingRight = false;
             if (!this.isPlaying('walk_left'))
               this.stop().animate('walk_left', 10, -1);
           }
           if (direction.x > 0)
           {
+            this.facingRight = true;
             if (!this.isPlaying('walk_right'))
               this.stop().animate('walk_right', 10, -1);
           }
@@ -40,7 +43,7 @@ function initializeGameComponents()
         function ()
         {
           this.life--;
-          console.log(this.life);
+          changeLife(this.life);
         });
     }});
 
@@ -50,7 +53,8 @@ function initializeGameComponents()
     {
       //setup animations
       this.requires('SpriteAnimation')
-      .animate('attack', 0, 2, 1)
+      .animate('attack_right', 0, 2, 1)
+      .animate('attack_left', 0, 3, 1)
 
       .requires('Keyboard')
       .attr('attackCounter', 150)
@@ -68,14 +72,26 @@ function initializeGameComponents()
     attack: function()
     {
       this.attackCounter = 0;
-      this.stop().animate('attack', 20, 0);
-      var treesHit = this.hit('Tree');
+      if (this.facingRight)
+      {
+        this.stop().animate('attack_right', 10, 0);
+        this.axe.x = this.x + this.w/2 + 8;
+        this.axe.y = this.y + this.h/2 - 24;
+      }
+      else
+      {
+        this.stop().animate('attack_left', 10, 0);
+        this.axe.x = this.x + this.w/2 - 8 - this.axe.w;
+        this.axe.y = this.y + this.h/2 - 24;
+      }
+
+      var treesHit = this.axe.hit('Tree');
       if(treesHit)
       {
         treesHit[0].obj.trigger('Hit');
       }
 
-      var enemiesHit = this.hit('Enemy');
+      var enemiesHit = this.axe.hit('Enemy');
       if(enemiesHit)
       {
         enemiesHit[0].obj.trigger('Hit');
@@ -128,6 +144,19 @@ function initializeGameComponents()
             if (this.tweenProperties.timeCounter > this.tweenProperties.duration)
             {
               this.falling = false;
+            }
+            else if (this.tweenProperties.timeCounter > 50 && this.tweenProperties.timeCounter < 100)
+            {
+              Crafty("Ape").each(function() { this.y -= 1.5; });
+              if (this.tweenProperties.timeCounter % 20 == 0)
+              {
+                marginTop += 5;
+              }
+              else if (this.tweenProperties.timeCounter % 20 == 10)
+              {
+                marginTop -= 5;
+              }
+              document.getElementById('pointsHUD').style.marginTop = marginTop + 'px';
             }
           }
         })
@@ -255,6 +284,7 @@ function initializeGameComponents()
               Crafty.viewport.pan('x', stageWidth, 50);
               player.tween({x: (stageWidth)*(stage+1)+50}, 65);
               stage++;
+              Crafty("blood").each(function() { this.destroy(); });
             }
           }
         });

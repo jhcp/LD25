@@ -20,19 +20,23 @@ function initializeEnemyComponents()
       .bind('Hit',
         function ()
         {
-          this.life--;
-          if (this.life>0)
+          if(!this.state.dying && !this.state.dead)
           {
-            //this.addTween({rotation: 2}, 'easeOutElastic', 18, endOfTween, [this])
-          }
-          else
-          {
-            for (ztate in this.state) {
-              this.state[ztate] = false;
+            this.life--;
+            if (this.life>0)
+            {
+
             }
-            this.state.dying = true;
-            this.setTweenProperties(0, 80, 50);
-            //this.addTween({rotation: 80}, 'easeOutBounce', 50, endOfTween, [this]);
+            else
+            {
+              for (ztate in this.state) {
+                this.state[ztate] = false;
+              }
+              this.state.dying = true;
+              this.setTweenProperties(0, 80, 50);
+              
+              createBlood(this.x + this.w/2);
+            }
           }
         })
       ;
@@ -91,26 +95,36 @@ function initializeEnemyComponents()
     {
       this.movement = { x: 0};
       this.backingCounter = 0;
-      this.state = {walking: true, attacking: false, backing: false, dying: false, dead: false};
-      this.counter = {walking: 100, attacking:0, backing:0};
+      this.state = {walking: true, attacking: false, backing: false, crossing: false, dying: false, dead: false};
+      this.counter = {walking: 100, attacking:0, backing:0, crossing:0};
       this.requires('Collision')
       .animate('attackRight', 0, 2, 1)
       .animate('attackLeft', 0, 3, 1)
       .attr({animationSpeed:100, nextThinking:10})
       .bind('EnterFrame', function ()
       {
-        if (this.state.dying)
+        if (this.state.crossing)
+        {
+          this.counter.crossing++;
+          if (this.counter.crossing > 30)
           {
-            this.rotation = this.easeOutBounce();
-            this.y +=0.25;
-            this.tweenProperties.timeCounter++;
-            if (this.tweenProperties.timeCounter > this.tweenProperties.duration)
-            {
-              this.state.dying = false;
-              this.state.dead = true;
-              this.setTweenProperties(1, 0, 50);
-            }
+            this.state.crossing = false;
+            this.state.walking = true
           }
+          this.x += this.movement.x;
+        }
+        if (this.state.dying)
+        {
+          this.rotation = this.easeOutBounce();
+          this.y +=0.25;
+          this.tweenProperties.timeCounter++;
+          if (this.tweenProperties.timeCounter > this.tweenProperties.duration)
+          {
+            this.state.dying = false;
+            this.state.dead = true;
+            this.setTweenProperties(1, 0, 50);
+          }
+        }
         if (this.state.dead)
         {
           this.alpha -=0.05;
@@ -160,14 +174,24 @@ function initializeEnemyComponents()
             var distanceLimit2 = 30
             if (distanceX >= 0)
             {
-              this.trigger('NewDirection', 1);  //trigger a NewDirection event so that it can change it's moving animation
+              this.trigger('NewDirection', {x:1, y:0});  //trigger a NewDirection event so that it can change it's moving animation
               if (distanceX > distanceLimit)
               {
                 this.movement.x = 2;
               }
               else if (distanceX > distanceLimit2)
               {
-                this.movement.x = 1;
+                if (randomNumber > 9)
+                {
+                  this.movement.x = 4;
+                  this.state.walking = false;
+                  this.state.crossing = true;
+                  this.counter.crossing = 0;
+                }
+                else
+                {
+                  this.movement.x = 1;
+                }
               }
               else
               {
@@ -176,14 +200,24 @@ function initializeEnemyComponents()
             }
             else
             {
-              this.trigger('NewDirection', -1);  //trigger a NewDirection event so that it can change it's moving animation
+              this.trigger('NewDirection', {x:-1, y:0});  //trigger a NewDirection event so that it can change it's moving animation
               if (distanceX < -distanceLimit)
               {
                 this.movement.x = -2;
               }
               else if (distanceX < -distanceLimit2)
               {
-                this.movement.x = -1;
+                if (randomNumber > 9)
+                {
+                  this.movement.x = -4;
+                  this.state.walking = false;
+                  this.state.crossing = true;
+                  this.counter.crossing = 0;
+                }
+                else
+                {
+                  this.movement.x = -1;
+                }
               }
               else
               {

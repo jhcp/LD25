@@ -1,5 +1,5 @@
 var testingMode = false;
-var collisionBox = true;
+var collisionBox = false;
 
 //stage variables
 var stageWidth = 832;   //26*32 =  832
@@ -11,6 +11,8 @@ var level = 0;
 var stage = 0;
 var points = 0;
 var pointsHUD = document.getElementById('points');
+var lifeHUD = document.getElementById('life');
+var marginTop = 25;
 var player = null;
 
 function generateWorld()
@@ -19,7 +21,6 @@ function generateWorld()
   var floorTile = Crafty.e('2D, DOM, Color, Collision, floor')
       .attr({ x: -100, y: 13*tileSize, w:map1.size + 200, h:3, z:10 })
       .color('white');
-  floorTile.addComponent('WiredHitBox');
 
   //generate trees
   for(var i=0;i<map1.trees.length;i++)
@@ -63,7 +64,7 @@ window.onload = function ()
     Crafty.background('url("assets/images/bg.png")');
     generateWorld();
 
-    createPlayer(6,11);
+    createPlayer(3,11);
     createNative(10,11);
     createNative(32,11);
     createNative(33,11);
@@ -104,7 +105,13 @@ function createPlayer(x, y)
     .gravityConst(.3)
     ;
 
+  player.axe = Crafty.e('2D, DOM')
+      .attr({ x: x*32, y: y*32, w:36, h:46, z:999 })
+     // .color('blue')
+      .addComponent('Collision');
+
   if (collisionBox) player.addComponent('WiredHitBox');
+  if (collisionBox) player.axe.addComponent('WiredHitBox');
 }
 
 function createNative(x, y)
@@ -112,7 +119,7 @@ function createNative(x, y)
   var nativeMan = Crafty.e('2D, DOM, nativeMan, Tweenable, Collision, Gravity,     Ape, Enemy, NativeTypeAxe')
     .attr({ x: x * 32, y: y * 32, z:1000 })
     .origin('bottom center')
-    .collision([22,3], [45,3], [45,62], [22,62])
+    .collision([55,3], [75,3], [75,50], [55,50])
     .gravity('floor')
     .gravityConst(.1)
     ;
@@ -126,7 +133,6 @@ function createTree(x, y, treeType, treeNumber)
     .attr({ x: x, y: y, z:999-treeNumber })
     .origin('bottom center')
     .collision([85,250], [160,150], [160,305], [85,305])
-    //.trigger('Bounce')
     ;
 
   if (collisionBox) tree.addComponent('WiredHitBox');
@@ -139,8 +145,21 @@ function createArrow()
     ;
 }
 
+function createBlood(x)
+{
+  Crafty.e('2D, DOM, Tween, blood, blood'+Crafty.math.randomInt(1,6))
+    .attr({ x: x, y: 415, z:999, h:1 })
+    .tween({h: 30}, 65);
+    ;
+}
+
 function increasePoints(x)
 {
   points += x;
   pointsHUD.innerHTML = points;
+}
+
+function changeLife(newValue)
+{
+  lifeHUD.innerHTML = newValue;
 }

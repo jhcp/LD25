@@ -14,7 +14,7 @@ var  images =
     ],
     'player':
     {
-      'sprite': 'assets/images/joe.png',
+      'sprite': 'assets/images/joe4.png',
     },
     'other':
     {
@@ -43,7 +43,7 @@ function setupImages()
     tree1: [0, 0],
     tree2: [1, 0],
   });
-  Crafty.sprite(64, images.player.sprite, {
+  Crafty.sprite(128, 64, images.player.sprite, {
     joe: [0, 0],
   });
   Crafty.sprite(64, images.enemySprites[0].file, {

@@ -1,5 +1,5 @@
 var testingMode = false;
-var collisionBox = false;
+var collisionBox = true;
 
 //stage variables
 var stageWidth = 832;   //26*32 =  832
@@ -99,7 +99,7 @@ function createPlayer(x, y)
   player = Crafty.e('2D, DOM, joe, Tween, Twoway, Collision, Gravity,     Ape, Player, AxeAttacker, LevelManager')
     .attr({ x: x * 32, y: y * 32, z:1000 })
     .twoway(3, 5)
-    .collision([22,3], [45,3], [45,42], [22,42])
+    .collision([58,3], [72,3], [72,50], [58,50])
     .gravity('floor')
     .gravityConst(.3)
     ;

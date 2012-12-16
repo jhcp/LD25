@@ -1,7 +1,8 @@
 function initializeGameComponents()
 {
   //BASIC APE MOVEMENTS
-  Crafty.c('Ape', {
+  Crafty.c('Ape',
+  {
     init: function()
     {
       //setup animations
@@ -29,6 +30,20 @@ function initializeGameComponents()
         });
     }});
     
+  Crafty.c('Player',
+  {
+    init: function()
+    {
+      this.life = 10;
+      this
+      .bind('Hit',
+        function ()
+        {
+          this.life--;
+          console.log(this.life);
+        });
+    }});
+
   //   AAAAAAAAAAXEEEEEEEEEEE
   Crafty.c('AxeAttacker', {
     init: function()
@@ -59,7 +74,7 @@ function initializeGameComponents()
       {
         treesHit[0].obj.trigger('Hit');
       }
-      
+
       var enemiesHit = this.hit('Enemy');
       if(enemiesHit)
       {
@@ -67,7 +82,7 @@ function initializeGameComponents()
       }
     }
     });
-    
+
 
 
 
@@ -76,14 +91,14 @@ function initializeGameComponents()
     init: function()
     {
       this
-        .attr('life', 3)
+        .attr('life', 2)
         .attr('hitCounter', 50)
         .attr('bouncing', false)
         .attr('falling', false)
         .bind('EnterFrame', function ()
         {
           this.hitCounter++;
-          
+
           if (this.bouncing)
           {
             this.rotation = this.easeOutElastic();
@@ -98,6 +113,18 @@ function initializeGameComponents()
             this.rotation = this.easeOutBounce();
             this.y +=0.5;
             this.tweenProperties.timeCounter++;
+
+            var enemiesHit = this.hit('Enemy');
+            if(enemiesHit)
+            {
+              for(var i=0;i<enemiesHit.length;i++)
+              {
+                if(!enemiesHit[i].obj.state.dying && !enemiesHit[i].obj.state.dead)
+                {
+                  enemiesHit[i].obj.trigger('Hit');  console.log('acertou');
+                }
+              };
+            }
             if (this.tweenProperties.timeCounter > this.tweenProperties.duration)
             {
               this.falling = false;
@@ -108,7 +135,7 @@ function initializeGameComponents()
         .bind('Hit',
           function ()
           {
-            if (this.hitCounter > 20)
+            if ( (this.hitCounter > 20) && !this.falling )
             {
               Crafty.audio.play("chop");
               this.life--;
@@ -121,18 +148,10 @@ function initializeGameComponents()
               else if (this.life==0)   //the tree dies
               {
                 this.setTweenProperties(0, 80, 150);
+                this.collision([140,250], [160,150], [160,305], [140,305]);
                 this.falling = true;
 
                 increasePoints(1);
-                if (points == 2)
-                {
-                  createArrow();
-                }
-                if (points == 3)
-                {
-                  Crafty.viewport.pan('x', 800, 50);
-                  player.tween({x: 850}, 65);
-                }
               }
             }
           })
@@ -206,6 +225,40 @@ function initializeGameComponents()
       }
     }
     });
+
+
+    Crafty.c('LevelManager', {
+    init: function()
+    {
+      this.stage = [];
+      for(var i=0;i<map1.stages;i++) this.stage[i] = {completed: false};
+
+      this
+      .bind('EnterFrame',
+        function ()
+        {
+          if (level == 0)
+          {
+            if ( !this.stage[0].completed && (points == 3) )
+            {
+              createArrow();
+              this.stage[0].completed = true;
+            }
+            else if ( !this.stage[1].completed && (points == 5) )
+            {
+              createArrow(); console.log('fim stage 2');
+              this.stage[1].completed = true;
+            }
+            else if ( this.stage[stage].completed
+                      && player.x > (stageWidth)*(stage+1)-150)
+            {
+              Crafty.viewport.pan('x', stageWidth, 50);
+              player.tween({x: (stageWidth)*(stage+1)+50}, 65);
+              stage++;
+            }
+          }
+        });
+    }});
 
 };
 

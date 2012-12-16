@@ -31,7 +31,8 @@ function initializeEnemyComponents()
               this.state[ztate] = false;
             }
             this.state.dying = true;
-            this.addTween({rotation: 80}, 'easeOutBounce', 50, endOfTween, [this]);
+            this.setTweenProperties(0, 80, 50);
+            //this.addTween({rotation: 80}, 'easeOutBounce', 50, endOfTween, [this]);
           }
         })
       ;
@@ -50,6 +51,12 @@ function initializeEnemyComponents()
       else
       {
         this.stop().animate('attackLeft', 20, 0);
+      }
+      
+      var playersHit = this.hit('joe');
+      if(playersHit)
+      {
+        playersHit[0].obj.trigger('Hit');
       }
     },
     backup: function()
@@ -92,6 +99,31 @@ function initializeEnemyComponents()
       .attr({animationSpeed:100, nextThinking:10})
       .bind('EnterFrame', function ()
       {
+        if (this.state.dying)
+          {
+            this.rotation = this.easeOutBounce();
+            this.y +=0.25;
+            this.tweenProperties.timeCounter++;
+            if (this.tweenProperties.timeCounter > this.tweenProperties.duration)
+            {
+              this.state.dying = false;
+              this.state.dead = true;
+              this.setTweenProperties(1, 0, 50);
+            }
+          }
+        if (this.state.dead)
+        {
+          this.alpha -=0.05;
+          if (this.alpha < 0)
+          {
+            this.rotation = 0;
+            this.alpha = 1;
+            this.x = 1000;
+            this.y = 11*32;
+            this.state.dead = false;
+            this.state.walking = true;
+          }
+        }
         if (this.state.attacking)
         {
           this.counter.attacking++;

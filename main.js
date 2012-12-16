@@ -2,32 +2,35 @@ var testingMode = false;
 var collisionBox = false;
 
 //stage variables
-var stageWidth = 26;   //26*32 =  832
+var stageWidth = 832;   //26*32 =  832
 var stageHeight = 16;  //16*32 =  512
 var tileSize = 32;
 
 //global state and variables
+var level = 0;
+var stage = 0;
 var points = 0;
 var pointsHUD = document.getElementById('points');
 var player = null;
 
 function generateWorld()
 {
-    //loop through all tiles
-    for (var i = 0; i < stageWidth*2; i++) {
-        for (var j = 13; j < 14; j++) {
+  //generate floor
+  var floorTile = Crafty.e('2D, DOM, Color, Collision, floor')
+      .attr({ x: -100, y: 13*tileSize, w:map1.size + 200, h:3, z:10 })
+      .color('white');
+  floorTile.addComponent('WiredHitBox');
 
-            //place grass on all tiles
-            grassType = Crafty.math.randomInt(1, 4);
-            Crafty.e('2D, DOM, grass' + 1)
-                .attr({ x: i * tileSize, y: j * tileSize, z:1 });
-        }
-    }
+  //generate trees
+  for(var i=0;i<map1.trees.length;i++)
+  {
+    createTree(map1.trees[i].x, map1.trees[i].y, map1.trees[i].type, i);
+  };
+};
 
-}
 window.onload = function ()
 {
-  Crafty.init(stageWidth*tileSize, stageHeight*tileSize);
+  Crafty.init(stageWidth, stageHeight*tileSize);
   setupImages();
   initializeGameComponents();
   initializeEnemyComponents();
@@ -59,10 +62,7 @@ window.onload = function ()
     //Crafty.background('white');
     Crafty.background('url("assets/images/bg.png")');
     generateWorld();
-    createTree(1, 13);
-    createTree(2, 15);
-    createTree(1, 19);
-    createTree(1, 28);
+
     createPlayer(6,11);
     createNative(10,11);
     createNative(32,11);
@@ -96,11 +96,11 @@ window.onload = function ()
 
 function createPlayer(x, y)
 {
-  player = Crafty.e('2D, DOM, joe, Tween, Twoway, Collision, Gravity,     Ape, AxeAttacker')
+  player = Crafty.e('2D, DOM, joe, Tween, Twoway, Collision, Gravity,     Ape, Player, AxeAttacker, LevelManager')
     .attr({ x: x * 32, y: y * 32, z:1000 })
     .twoway(3, 5)
     .collision([22,3], [45,3], [45,42], [22,42])
-    .gravity('grass1')
+    .gravity('floor')
     .gravityConst(.3)
     ;
 
@@ -109,23 +109,23 @@ function createPlayer(x, y)
 
 function createNative(x, y)
 {
-  var nativeMan = Crafty.e('2D, DOM, nativeMan, Tweener, Collision, Gravity,     Ape, Enemy, NativeTypeAxe')
+  var nativeMan = Crafty.e('2D, DOM, nativeMan, Tweenable, Collision, Gravity,     Ape, Enemy, NativeTypeAxe')
     .attr({ x: x * 32, y: y * 32, z:1000 })
     .origin('bottom center')
     .collision([22,3], [45,3], [45,62], [22,62])
-    .gravity('grass1')
+    .gravity('floor')
     .gravityConst(.1)
     ;
 
   if (collisionBox) nativeMan.addComponent('WiredHitBox');
 }
 
-function createTree(treeType, x)
+function createTree(x, y, treeType, treeNumber)
 {
-  var tree = Crafty.e('2D, DOM, tree'+treeType+', Tweener, Collision,       Tree')
-    .attr({ x: x * 32, y: 101, z:500 })
+  var tree = Crafty.e('2D, DOM, tree'+treeType+', Tweenable, Collision,       Tree')
+    .attr({ x: x, y: y, z:999-treeNumber })
     .origin('bottom center')
-    .collision([85,250], [160,250], [160,305], [85,305])
+    .collision([85,250], [160,150], [160,305], [85,305])
     //.trigger('Bounce')
     ;
 
@@ -135,7 +135,7 @@ function createTree(treeType, x)
 function createArrow()
 {
   Crafty.e('2D, DOM, nextStageArrow')
-    .attr({ x: 680, y: 50, z:1500 })
+    .attr({ x: stageWidth*(stage+1)-150, y: 50, z:1500 })
     ;
 }
 

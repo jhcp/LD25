@@ -12,7 +12,7 @@ var map1 =
 
     {'x': 28*tileSize, 'y':101, 'type':1},
     {'x': 32*tileSize, 'y':101, 'type':1},
-    //{'x': 36*tileSize, 'y':101, 'type':1},
+    {'x': 65*tileSize, 'y':101, 'type':1},
     //{'x': 40*tileSize, 'y':101, 'type':1},
   ]
 }

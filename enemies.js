@@ -34,8 +34,9 @@ function initializeEnemyComponents()
               }
               this.state.dying = true;
               this.setTweenProperties(0, 80, 50);
-              
+              this.stop();
               createBlood(this.x + this.w/2);
+              Crafty.audio.play("hurt");
             }
           }
         })

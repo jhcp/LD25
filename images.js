@@ -2,7 +2,7 @@ var  images =
   {
     'baseTiles':
     [
-      {'name': 'dirt', 'file': 'assets/images/tile2big.png'},
+      {'name': 'grass', 'file': 'assets/images/tile2big.png'},
     ],
     'trees':
     {
@@ -14,7 +14,7 @@ var  images =
     ],
     'player':
     {
-      'sprite': 'assets/images/joe4.png',
+      'sprite': 'assets/images/joe5.png',
     },
     'other':
     {

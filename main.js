@@ -18,9 +18,10 @@ var player = null;
 function generateWorld()
 {
   //generate floor
-  var floorTile = Crafty.e('2D, DOM, Color, Collision, floor')
+  var floorTile = Crafty.e('2D, DOM, Collision, floor')
       .attr({ x: -100, y: 13*tileSize, w:map1.size + 200, h:3, z:10 })
-      .color('white');
+      //.color('white')
+      ;
 
   //generate trees
   for(var i=0;i<map1.trees.length;i++)
@@ -37,6 +38,12 @@ window.onload = function ()
   initializeEnemyComponents();
 
   Crafty.audio.add("chop", "assets/audio/chop.ogg");
+  Crafty.audio.add("playerHurt", "assets/audio/6.ogg");
+  Crafty.audio.add("hurt", "assets/audio/randomize12.ogg");
+  Crafty.audio.add("hurt2", "assets/audio/3.ogg");
+  Crafty.audio.add("treeFall2", "assets/audio/5.ogg");
+  Crafty.audio.add("treeFall", "assets/audio/explosion3.ogg");
+  Crafty.audio.add("go", "assets/audio/8repeat.ogg")
 
   Crafty.scene('loading', function ()
   {
@@ -143,6 +150,7 @@ function createArrow()
   Crafty.e('2D, DOM, nextStageArrow')
     .attr({ x: stageWidth*(stage+1)-150, y: 50, z:1500 })
     ;
+  Crafty.audio.play("go");
 }
 
 function createBlood(x)

@@ -8,8 +8,8 @@ function initializeGameComponents()
       this.facingRight = true;
       //setup animations
       this.requires('SpriteAnimation')
-      .animate('walk_left', 0, 1, 0)
-      .animate('walk_right', 0, 0, 0)
+      .animate('walk_left', 0, 1, 1)
+      .animate('walk_right', 0, 0, 1)
 
       .bind('NewDirection',
         function (direction)
@@ -44,6 +44,7 @@ function initializeGameComponents()
         {
           this.life--;
           changeLife(this.life);
+          Crafty.audio.play("playerHurt");
         });
     }});
 
@@ -137,7 +138,7 @@ function initializeGameComponents()
               {
                 if(!enemiesHit[i].obj.state.dying && !enemiesHit[i].obj.state.dead)
                 {
-                  enemiesHit[i].obj.trigger('Hit');  console.log('acertou');
+                  enemiesHit[i].obj.trigger('Hit');
                 }
               };
             }
@@ -147,6 +148,9 @@ function initializeGameComponents()
             }
             else if (this.tweenProperties.timeCounter > 50 && this.tweenProperties.timeCounter < 100)
             {
+              if (this.tweenProperties.timeCounter == 66)
+                Crafty.audio.play("treeFall");
+
               Crafty("Ape").each(function() { this.y -= 1.5; });
               if (this.tweenProperties.timeCounter % 20 == 0)
               {
@@ -268,15 +272,20 @@ function initializeGameComponents()
         {
           if (level == 0)
           {
-            if ( !this.stage[0].completed && (points == 3) )
+            if ( !this.stage[0].completed && (points == 5) )
             {
               createArrow();
               this.stage[0].completed = true;
             }
-            else if ( !this.stage[1].completed && (points == 5) )
+            else if ( !this.stage[1].completed && (points == 7) )
             {
               createArrow(); console.log('fim stage 2');
               this.stage[1].completed = true;
+            }
+            else if ( !this.stage[2].completed && (points == 8) )
+            {
+              createArrow(); console.log('fim stage 3');
+              this.stage[2].completed = true;
             }
             else if ( this.stage[stage].completed
                       && player.x > (stageWidth)*(stage+1)-150)

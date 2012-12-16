@@ -10,16 +10,22 @@ var tileSize = 32;
 var level = 0;
 var stage = 0;
 var points = 0;
+var killedIndians = 0;
 var pointsHUD = document.getElementById('points');
 var lifeHUD = document.getElementById('life');
 var marginTop = 25;
 var player = null;
+var indians = new Array();
+
+var dialog = null;
+var lastMsgTimer = 0;
+var nextMsgTime = -1;
 
 function generateWorld()
 {
   //generate floor
   var floorTile = Crafty.e('2D, DOM, Collision, floor')
-      .attr({ x: -100, y: 13*tileSize, w:map1.size + 200, h:3, z:10 })
+      .attr({ x: -100, y: 13*tileSize+50, w:map1.size + 200, h:3, z:10 })
       //.color('white')
       ;
 
@@ -27,6 +33,7 @@ function generateWorld()
   for(var i=0;i<map1.trees.length;i++)
   {
     createTree(map1.trees[i].x, map1.trees[i].y, map1.trees[i].type, i);
+
   };
 };
 
@@ -40,10 +47,10 @@ window.onload = function ()
   Crafty.audio.add("chop", "assets/audio/chop.ogg");
   Crafty.audio.add("playerHurt", "assets/audio/6.ogg");
   Crafty.audio.add("hurt", "assets/audio/randomize12.ogg");
-  Crafty.audio.add("hurt2", "assets/audio/3.ogg");
-  Crafty.audio.add("treeFall2", "assets/audio/5.ogg");
+  //Crafty.audio.add("hurt2", "assets/audio/3.ogg");
+  //Crafty.audio.add("treeFall2", "assets/audio/5.ogg");
   Crafty.audio.add("treeFall", "assets/audio/explosion3.ogg");
-  Crafty.audio.add("go", "assets/audio/8repeat.ogg")
+  Crafty.audio.add("go", "assets/audio/8repeat.ogg");
 
   Crafty.scene('loading', function ()
   {
@@ -72,9 +79,9 @@ window.onload = function ()
     generateWorld();
 
     createPlayer(3,11);
-    createNative(10,11);
-    createNative(32,11);
-    createNative(33,11);
+    //createNative(10,11);
+    //createNative(32,11);
+    //createNative(33,11);
 
     Crafty.viewport.clampToEntities = false;
 
@@ -121,7 +128,7 @@ function createPlayer(x, y)
   if (collisionBox) player.axe.addComponent('WiredHitBox');
 }
 
-function createNative(x, y)
+function createNative(x, y, first)
 {
   var nativeMan = Crafty.e('2D, DOM, nativeMan, Tweenable, Collision, Gravity,     Ape, Enemy, NativeTypeAxe')
     .attr({ x: x * 32, y: y * 32, z:1000 })
@@ -131,16 +138,28 @@ function createNative(x, y)
     .gravityConst(.1)
     ;
 
+  nativeMan.axe = Crafty.e('2D, DOM')
+    .attr({ x: x*32, y: y*32, w:30, h:46, z:999 })
+   // .color('blue')
+    .addComponent('Collision');
+
+  indians.push(nativeMan);
+
+
+  if (first) nativeMan.first = true;
+
   if (collisionBox) nativeMan.addComponent('WiredHitBox');
+  if (collisionBox) nativeMan.axe.addComponent('WiredHitBox');
 }
 
 function createTree(x, y, treeType, treeNumber)
 {
   var tree = Crafty.e('2D, DOM, tree'+treeType+', Tweenable, Collision,       Tree')
-    .attr({ x: x, y: y, z:999-treeNumber })
+    .attr({ x: x, y: y + (Crafty.math.randomInt(-2,2)*5), z:999-treeNumber })
     .origin('bottom center')
-    .collision([85,250], [160,150], [160,305], [85,305])
+    .collision([85,250], [160,150], [160,305+140], [85,305+140])
     ;
+  if (treeNumber == 0) tree.setFirst();
 
   if (collisionBox) tree.addComponent('WiredHitBox');
 }
@@ -153,10 +172,10 @@ function createArrow()
   Crafty.audio.play("go");
 }
 
-function createBlood(x)
+function createBlood(x, y)
 {
   Crafty.e('2D, DOM, Tween, blood, blood'+Crafty.math.randomInt(1,6))
-    .attr({ x: x, y: 415, z:999, h:1 })
+    .attr({ x: x, y: y, z:600, h:1 })
     .tween({h: 30}, 65);
     ;
 }
@@ -170,4 +189,15 @@ function increasePoints(x)
 function changeLife(newValue)
 {
   lifeHUD.innerHTML = newValue;
+}
+
+function showText(speaker, msg)
+{
+   dialog = Crafty.e('2D, DOM, Text, css_dialog, dialog')
+        .attr({ w: 220, h: 120, x: speaker.x-55, y: speaker.y-50, z:2001 })
+        .text(msg);
+   lastMsgTimer = Crafty.frame();
+   speaker.attach(dialog);
+   
+   nextMsgTime = lastMsgTimer + 1500 + Crafty.math.randomInt(100,500);
 }

@@ -40,9 +40,10 @@ function setupImages()
   Crafty.sprite(32, images.baseTiles[0].file, {
     grass2: [0, 0],
   });
-  Crafty.sprite(238, 316, images.trees.tree1, {
+  Crafty.sprite(238, 464, images.trees.tree1, {
     tree1: [0, 0],
     tree2: [1, 0],
+    tree3: [2, 0],
   });
   Crafty.sprite(128, 64, images.player.sprite, {
     joe: [0, 0],

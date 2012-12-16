@@ -3,16 +3,23 @@ var map1 =
   'stages': 4,
   'size': -1,
   'trees':
-  [
-    {'x': 6*tileSize, 'y':101, 'type':1},
-    {'x': 8*tileSize, 'y':101, 'type':2},
-    {'x': 15*tileSize, 'y':101, 'type':1},
-    {'x': 16*tileSize, 'y':101, 'type':1},
-    {'x': 20*tileSize, 'y':101, 'type':2},
+  [   //one scene = 26 tiles   [0, 26, 52, 78, 104...
+    {'x': 10*tileSize, 'y':01, 'type':3},
 
-    {'x': 28*tileSize, 'y':101, 'type':1},
-    {'x': 32*tileSize, 'y':101, 'type':1},
-    {'x': 65*tileSize, 'y':101, 'type':1},
+    {'x': 30*tileSize, 'y':1, 'type':1},
+    {'x': 34*tileSize, 'y':1, 'type':2},
+    {'x': 37*tileSize, 'y':1, 'type':1},
+    {'x': 39*tileSize, 'y':1, 'type':2},
+    {'x': 44*tileSize, 'y':1, 'type':1},
+    {'x': 45*tileSize, 'y':1, 'type':2},
+
+    {'x': 55*tileSize, 'y':1, 'type':1},
+    {'x': 58*tileSize, 'y':1, 'type':1},
+    {'x': 59*tileSize, 'y':1, 'type':2},
+    {'x': 63*tileSize, 'y':1, 'type':1},
+    {'x': 66*tileSize, 'y':1, 'type':3},
+    {'x': 70*tileSize, 'y':1, 'type':1},
+    {'x': 72*tileSize, 'y':1, 'type':1},
     //{'x': 40*tileSize, 'y':101, 'type':1},
   ]
 }

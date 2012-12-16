@@ -5,6 +5,7 @@ function initializeEnemyComponents()
     init: function()
     {
       //setup animations
+      this.saidMsg = null;
       this.requires('SpriteAnimation')
       .attr('attackCounter', 150)
       .bind('EnterFrame', function ()
@@ -35,8 +36,16 @@ function initializeEnemyComponents()
               this.state.dying = true;
               this.setTweenProperties(0, 80, 50);
               this.stop();
-              createBlood(this.x + this.w/2);
+              createBlood(this.x + this.w/2, this.y+60);
               Crafty.audio.play("hurt");
+
+              killedIndians++;
+              if (this.first)
+              {
+                this.first = false;
+                createNative(32,11);
+                createNative(35,11);
+              }
             }
           }
         })
@@ -52,13 +61,17 @@ function initializeEnemyComponents()
       if (this.calculateDistanceFromPlayer() >= 0)
       {
         this.stop().animate('attackRight', 20, 0);
+        this.axe.x = this.x + this.w/2 + 11;
+        this.axe.y = this.y + this.h/2 - 24;
       }
       else
       {
         this.stop().animate('attackLeft', 20, 0);
+        this.axe.x = this.x + this.w/2 - 11 - this.axe.w;
+        this.axe.y = this.y + this.h/2 - 24;
       }
       
-      var playersHit = this.hit('joe');
+      var playersHit = this.axe.hit('joe');
       if(playersHit)
       {
         playersHit[0].obj.trigger('Hit');
@@ -95,6 +108,7 @@ function initializeEnemyComponents()
     init: function()
     {
       this.movement = { x: 0};
+      this.first = false;
       this.backingCounter = 0;
       this.state = {walking: true, attacking: false, backing: false, crossing: false, dying: false, dead: false};
       this.counter = {walking: 100, attacking:0, backing:0, crossing:0};
@@ -133,7 +147,7 @@ function initializeEnemyComponents()
           {
             this.rotation = 0;
             this.alpha = 1;
-            this.x = 1000;
+            this.x = 1500;
             this.y = 11*32;
             this.state.dead = false;
             this.state.walking = true;
@@ -231,7 +245,20 @@ function initializeEnemyComponents()
           }
 
           //the actual movement
-          this.x += this.movement.x;
+          if ( !(this.first && this.x < 650)) //little hack for stoping the first indian
+          {
+            this.x += this.movement.x;
+          }
+          else
+          {
+            if (!this.saidMsg)
+            {
+              showText(this, "What are you doing?");
+              this.saidMsg = true;
+
+            }
+            this.stop();
+          }
         }
 
       });
@@ -240,3 +267,23 @@ function initializeEnemyComponents()
 
 
 }
+
+
+var insults = 
+[
+  "Don't destroy the forest!",
+  "Are you insane?",
+  "How do you do (do you do) the things that you do?",
+  "Why are you doing this?",
+  "So, you like wood, I see...",
+  "You make me sick",
+  "In the name of progress, I know",
+  "What's that in your pocket? Oh...",
+  "OMG, where are your eyes?!??",
+  "Me... kill... you",
+  "You killed my family!!",
+  "Are you the evil guy people 've been talking about?",
+  "You're a lumberjack? But where's your beard!?",
+  "Hunf",
+  "Is it worthy?"
+];

@@ -89,7 +89,7 @@ function initializeGameComponents()
       var treesHit = this.axe.hit('Tree');
       if(treesHit)
       {
-        treesHit[0].obj.trigger('Hit');
+        treesHit[0].obj.trigger('Hit', this.facingRight);
       }
 
       var enemiesHit = this.axe.hit('Enemy');
@@ -105,10 +105,15 @@ function initializeGameComponents()
 
     //  TREEEEEEEE
     Crafty.c('Tree', {
+    setFirst: function()
+    {
+      this.isFirst = true;
+    },
     init: function()
     {
       this
-        .attr('life', 2)
+        .attr('life', 3)
+        .attr('isFirst', false)
         .attr('hitCounter', 50)
         .attr('bouncing', false)
         .attr('falling', false)
@@ -128,7 +133,7 @@ function initializeGameComponents()
           if (this.falling)
           {
             this.rotation = this.easeOutBounce();
-            this.y +=0.5;
+            if (!this.isFirst) this.y +=0.5;
             this.tweenProperties.timeCounter++;
 
             var enemiesHit = this.hit('Enemy');
@@ -148,15 +153,34 @@ function initializeGameComponents()
             }
             else if (this.tweenProperties.timeCounter > 50 && this.tweenProperties.timeCounter < 100)
             {
-              if (this.tweenProperties.timeCounter == 66)
+              if (!this.isFirst)
+              {
+                if (this.tweenProperties.timeCounter == 66)
+                  Crafty.audio.play("treeFall");
+  
+                Crafty("Ape").each(function() { this.y -= 1.5; });
+                if (this.tweenProperties.timeCounter % 20 == 0)
+                {
+                  marginTop += 5;
+                }
+                else if (this.tweenProperties.timeCounter % 20 == 10)
+                {
+                  marginTop -= 5;
+                }
+                document.getElementById('pointsHUD').style.marginTop = marginTop + 'px';
+              }
+            }
+            else if (this.isFirst && this.tweenProperties.timeCounter > 250 && this.tweenProperties.timeCounter < 340)
+            {
+              if (this.tweenProperties.timeCounter == 254)
                 Crafty.audio.play("treeFall");
 
               Crafty("Ape").each(function() { this.y -= 1.5; });
-              if (this.tweenProperties.timeCounter % 20 == 0)
+              if (this.tweenProperties.timeCounter % 10 == 0)
               {
                 marginTop += 5;
               }
-              else if (this.tweenProperties.timeCounter % 20 == 10)
+              else if (this.tweenProperties.timeCounter % 10 == 4)
               {
                 marginTop -= 5;
               }
@@ -166,7 +190,7 @@ function initializeGameComponents()
         })
         .requires('Tweenable')
         .bind('Hit',
-          function ()
+          function (directionRight)
           {
             if ( (this.hitCounter > 20) && !this.falling )
             {
@@ -175,13 +199,28 @@ function initializeGameComponents()
               this.hitCounter = 0;
               if (this.life>0)
               {
-                this.setTweenProperties(0, 2, 50);
+                if (directionRight) this.setTweenProperties(0, 2, 50);
+                  else this.setTweenProperties(0, -2, 50);
                 this.bouncing = true;
               }
               else if (this.life==0)   //the tree dies
               {
-                this.setTweenProperties(0, 80, 150);
-                this.collision([140,250], [160,150], [160,305], [140,305]);
+                if (this.isFirst)
+                {
+                  this.setTweenProperties(0, 80, 650);
+                  this.collision([140,250], [160,150], [160,305], [140,305]);
+                  createNative(25, 11, true);
+                }
+                else if (directionRight)
+                {
+                  this.setTweenProperties(0, 80, 150);
+                  this.collision([140,250], [160,150], [160,305], [140,305]);
+                }
+                else
+                {
+                  this.setTweenProperties(0, -80, 150);
+                  this.collision([90,150], [110,250], [110,305], [90,305]);
+                }
                 this.falling = true;
 
                 increasePoints(1);
@@ -270,19 +309,38 @@ function initializeGameComponents()
       .bind('EnterFrame',
         function ()
         {
+          //handle the messages
+          if (dialog != null && (Crafty.frame() - lastMsgTimer) > 150)
+          {
+            dialog.destroy();
+            dialog = null;
+          }
+          else if (nextMsgTime > 0 && Crafty.frame() > nextMsgTime)
+          {
+            for (var i=0;i<indians.length;i++)
+            {
+              if (indians[i].x < stageWidth*(stage+1)-150)
+              {
+                 showText(indians[i], insults[Crafty.math.randomInt(0, insults.length-1)]);
+                 break;
+              }
+            }
+          }
+
+          //handle the stages within the lvel
           if (level == 0)
           {
-            if ( !this.stage[0].completed && (points == 5) )
+            if ( !this.stage[0].completed && (killedIndians == 3) )
             {
               createArrow();
               this.stage[0].completed = true;
             }
-            else if ( !this.stage[1].completed && (points == 7) )
+            else if ( !this.stage[1].completed && (killedIndians == 5) )
             {
               createArrow(); console.log('fim stage 2');
               this.stage[1].completed = true;
             }
-            else if ( !this.stage[2].completed && (points == 8) )
+            else if ( !this.stage[2].completed && (killedIndians == 8) )
             {
               createArrow(); console.log('fim stage 3');
               this.stage[2].completed = true;

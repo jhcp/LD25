@@ -30,6 +30,8 @@ window.onload = function ()
   Crafty.init(stageWidth*tileSize, stageHeight*tileSize);
   setupImages();
   initializeGameComponents();
+  initializeEnemyComponents();
+
   Crafty.audio.add("chop", "assets/audio/chop.ogg");
 
   Crafty.scene('loading', function ()
@@ -57,12 +59,12 @@ window.onload = function ()
     //Crafty.background('white');
     Crafty.background('url("assets/images/bg.png")');
     generateWorld();
-    createTree(9);
-    createTree(13);
-    createTree(15);
-    createTree(28);
+    createTree(1, 13);
+    createTree(2, 15);
+    createTree(1, 19);
+    createTree(1, 28);
     createPlayer(6,11);
-    createNative(30,11);
+    createNative(10,11);
     createNative(32,11);
     createNative(33,11);
 
@@ -107,7 +109,7 @@ function createPlayer(x, y)
 
 function createNative(x, y)
 {
-  var nativeMan = Crafty.e('2D, DOM, nativeMan, Tweener, Collision, Gravity,     Ape, Enemy, NativeTypeA')
+  var nativeMan = Crafty.e('2D, DOM, nativeMan, Tweener, Collision, Gravity,     Ape, Enemy, NativeTypeAxe')
     .attr({ x: x * 32, y: y * 32, z:1000 })
     .origin('bottom center')
     .collision([22,3], [45,3], [45,62], [22,62])
@@ -118,9 +120,9 @@ function createNative(x, y)
   if (collisionBox) nativeMan.addComponent('WiredHitBox');
 }
 
-function createTree(x)
+function createTree(treeType, x)
 {
-  var tree = Crafty.e('2D, DOM, tree1, Tweener, Collision,       Tree')
+  var tree = Crafty.e('2D, DOM, tree'+treeType+', Tweener, Collision,       Tree')
     .attr({ x: x * 32, y: 101, z:500 })
     .origin('bottom center')
     .collision([85,250], [160,250], [160,305], [85,305])
@@ -133,7 +135,7 @@ function createTree(x)
 function createArrow()
 {
   Crafty.e('2D, DOM, nextStageArrow')
-    .attr({ x: 680, y: 100, z:1500 })
+    .attr({ x: 680, y: 50, z:1500 })
     ;
 }
 

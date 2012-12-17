@@ -11,21 +11,39 @@ var level = 0;
 var stage = 0;
 var points = 0;
 var killedIndians = 0;
+var indiansLeft = 20;
 var pointsHUD = document.getElementById('points');
 var lifeHUD = document.getElementById('life');
+var finalText = null;
 var marginTop = 25;
 var player = null;
 var indians = new Array();
+
 
 var dialog = null;
 var lastMsgTimer = 0;
 var nextMsgTime = -1;
 
+function reset()
+{
+  level = 0;
+  stage = 0;
+  points = 0;
+  killedIndians = 0;
+  indiansLeft = 20;
+  dialog = null;
+  lastMsgTimer = 0;
+  nextMsgTime = -1;
+  
+  pointsHUD.innerHTML = 0;
+  lifeHUD.innerHTML = 10;
+}
+
 function generateWorld()
 {
   //generate floor
   var floorTile = Crafty.e('2D, DOM, Collision, floor')
-      .attr({ x: -100, y: 13*tileSize+50, w:map1.size + 200, h:3, z:10 })
+      .attr({ x: -100, y: 13*tileSize+50, w:map1.size + 2000, h:3, z:10 })
       //.color('white')
       ;
 
@@ -47,8 +65,6 @@ window.onload = function ()
   Crafty.audio.add("chop", "assets/audio/chop.ogg");
   Crafty.audio.add("playerHurt", "assets/audio/6.ogg");
   Crafty.audio.add("hurt", "assets/audio/randomize12.ogg");
-  //Crafty.audio.add("hurt2", "assets/audio/3.ogg");
-  //Crafty.audio.add("treeFall2", "assets/audio/5.ogg");
   Crafty.audio.add("treeFall", "assets/audio/explosion3.ogg");
   Crafty.audio.add("go", "assets/audio/8repeat.ogg");
 
@@ -65,12 +81,37 @@ window.onload = function ()
       setupImages();
       loadingText.destroy();
 
-      Crafty.scene('level1');
+      Crafty.scene('title');
     });
     
 
   });
   Crafty.scene('loading');
+
+
+  Crafty.scene('title', function ()
+  {
+    Crafty.background('url("assets/images/bg.png")');
+    reset();
+
+    var titleEntity = Crafty.e('2D, DOM, title')
+      .attr({ x: 0, y: 20, z:10 })
+      ;
+    var titleText = Crafty.e('2D, DOM, Text, Keyboard')
+      .attr({ w: 300, h: 50, x: 270, y: 385, z:100 })
+      .text('(press SPACE to play)')
+      .css({ 'text-align': 'center' })
+      .css({ 'color': 'white' });
+    
+    titleText.bind('KeyDown', function(e)
+    {
+      if(e.key == Crafty.keys['SPACE'])
+      {
+        Crafty.scene('level1');
+      }
+    });
+
+  });
 
   Crafty.scene('level1', function ()
   {
@@ -152,21 +193,30 @@ function createNative(x, y, first)
   if (collisionBox) nativeMan.axe.addComponent('WiredHitBox');
 }
 
+var lastTreeCreated = false;
 function createTree(x, y, treeType, treeNumber)
 {
   var tree = Crafty.e('2D, DOM, tree'+treeType+', Tweenable, Collision,       Tree')
     .attr({ x: x, y: y + (Crafty.math.randomInt(-2,2)*5), z:999-treeNumber })
+    //.attr({ x: x, y: y + (Crafty.math.randomInt(-2,2)*5), z:600+treeNumber })
     .origin('bottom center')
     .collision([85,250], [160,150], [160,305+140], [85,305+140])
     ;
   if (treeNumber == 0) tree.setFirst();
+  else if (treeNumber == 40)
+  {
+    tree.life = 1;
+    tree.isLast = true;
+    tree.trigger('Hit', false);
+  }
+
 
   if (collisionBox) tree.addComponent('WiredHitBox');
 }
 
 function createArrow()
 {
-  Crafty.e('2D, DOM, nextStageArrow')
+  Crafty.e('2D, DOM, nextStageArrow, Blinker')
     .attr({ x: stageWidth*(stage+1)-150, y: 50, z:1500 })
     ;
   Crafty.audio.play("go");
@@ -193,7 +243,7 @@ function changeLife(newValue)
 
 function showText(speaker, msg)
 {
-   dialog = Crafty.e('2D, DOM, Text, css_dialog, dialog')
+   dialog = Crafty.e('2D, DOM, Text')
         .attr({ w: 220, h: 120, x: speaker.x-55, y: speaker.y-50, z:2001 })
         .text(msg);
    lastMsgTimer = Crafty.frame();

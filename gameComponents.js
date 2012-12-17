@@ -45,6 +45,14 @@ function initializeGameComponents()
           this.life--;
           changeLife(this.life);
           Crafty.audio.play("playerHurt");
+          
+          if (this.life==0)  //die
+          {
+            this.tween({'alpha':0}, 150);
+            Crafty.e('2D, DOM, Text')
+              .attr({ w: 220, h: 120, x: this.x-55, y: this.y-50, z:2001 })
+              .text('You died. Press 5 to start over');
+          }
         });
     }});
 
@@ -65,7 +73,9 @@ function initializeGameComponents()
           if (this.attackCounter > 20)
           {
             if (this.isDown('SPACE')) this.attack();
-          };
+          }
+          
+          if (this.isDown('5') || this.isDown('NUMPAD_5')) Crafty.scene('title');
       })
       ;
     }
@@ -114,6 +124,7 @@ function initializeGameComponents()
       this
         .attr('life', 3)
         .attr('isFirst', false)
+        .attr('isLast', false)
         .attr('hitCounter', 50)
         .attr('bouncing', false)
         .attr('falling', false)
@@ -133,7 +144,9 @@ function initializeGameComponents()
           if (this.falling)
           {
             this.rotation = this.easeOutBounce();
-            if (!this.isFirst) this.y +=0.5;
+            if (!this.isFirst) this.y -=0.7;
+            if (!this.isFirst) this.x +=0.2;
+            if (!this.isFirst) this.z -=1;
             this.tweenProperties.timeCounter++;
 
             var enemiesHit = this.hit('Enemy');
@@ -150,6 +163,7 @@ function initializeGameComponents()
             if (this.tweenProperties.timeCounter > this.tweenProperties.duration)
             {
               this.falling = false;
+              this.collision([0,0], [1,0], [1,1])
             }
             else if (this.tweenProperties.timeCounter > 50 && this.tweenProperties.timeCounter < 100)
             {
@@ -210,6 +224,11 @@ function initializeGameComponents()
                   this.setTweenProperties(0, 80, 650);
                   this.collision([140,250], [160,150], [160,305], [140,305]);
                   createNative(25, 11, true);
+                }
+                else if (this.isLast)
+                {
+                  this.setTweenProperties(0, -80, 50);
+                  this.collision([90,150], [110,250], [110,305], [90,305]);
                 }
                 else if (directionRight)
                 {
@@ -327,36 +346,77 @@ function initializeGameComponents()
             }
           }
 
-          //handle the stages within the lvel
+          //handle the stages within the level
           if (level == 0)
           {
-            if ( !this.stage[0].completed && (killedIndians == 3) )
+            if ( !this.stage[0].completed && (killedIndians == 1) )
             {
               createArrow();
               this.stage[0].completed = true;
             }
-            else if ( !this.stage[1].completed && (killedIndians == 5) )
+            else if ( !this.stage[1].completed && (points == 7) )  //7
             {
               createArrow(); console.log('fim stage 2');
               this.stage[1].completed = true;
             }
-            else if ( !this.stage[2].completed && (killedIndians == 8) )
+            else if ( !this.stage[2].completed && (points == 14) )    //14
             {
               createArrow(); console.log('fim stage 3');
               this.stage[2].completed = true;
+              
+              finalText = Crafty.e('2D, DOM, Text')
+              .attr({ w: 400, h: 220, x: stageWidth*3+200, y: 50, z:2001 })
+              .text('The forest is destroyed. Now you just need to kill the 20 men left and go home');
+              
+              indiansLeft = 20;
+
             }
-            else if ( this.stage[stage].completed
+            else if ( !this.stage[3].completed && (indiansLeft == 0) )    //14
+            {
+              createArrow(); console.log('fim stage 4');
+              this.stage[3].completed = true;
+            }
+            else if ( stage < 4 && this.stage[stage].completed
                       && player.x > (stageWidth)*(stage+1)-150)
             {
-              Crafty.viewport.pan('x', stageWidth, 50);
-              player.tween({x: (stageWidth)*(stage+1)+50}, 65);
-              stage++;
-              Crafty("blood").each(function() { this.destroy(); });
+              if (stage==3 && !lastTreeCreated)
+              {
+                 createTree(stageWidth*4, 1, 1, 40);
+                 lastTreeCreated = true;
+                 player.life = 1;
+                 player.trigger('Hit');
+                 player.z = 100;
+              }
+              else
+              {
+                if (stage!=3)
+                {
+                  Crafty.viewport.pan('x', stageWidth, 50);
+                  player.tween({x: (stageWidth)*(stage+1)+50}, 45);
+                  stage++;
+                  Crafty('blood').each(function() { this.destroy(); });
+                }
+              }
             }
           }
         });
     }});
 
+    Crafty.c('Blinker',
+    {
+      init: function()
+      {
+        this.visible = true;
+        this.rate = 10;
+        this.bind('EnterFrame', function()
+        {
+          if (Crafty.frame() % this.rate == 0)
+          {
+            this.visible = !this.visible;
+          }
+        });
+      }
+    });
 };
 
 function endOfTween(tweenedEntity)

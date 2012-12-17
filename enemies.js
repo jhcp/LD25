@@ -40,11 +40,16 @@ function initializeEnemyComponents()
               Crafty.audio.play("hurt");
 
               killedIndians++;
+              if (stage == 3)
+              {
+                indiansLeft--;
+                finalText.text('The forest is destroyed. Now you just need to kill the ' +indiansLeft+' men left and go home');
+              }
               if (this.first)
               {
                 this.first = false;
-                createNative(32,11);
-                createNative(35,11);
+                createNative(38,11);
+                createNative(40,11);
               }
             }
           }
@@ -147,7 +152,18 @@ function initializeEnemyComponents()
           {
             this.rotation = 0;
             this.alpha = 1;
-            this.x = 1500;
+            if (stage == 2)
+            {
+              this.x = stageWidth*2 - Crafty.math.randomInt(1,5)*150;
+            }
+            if (stage == 3)
+            {
+              this.x = stageWidth*4 + (indiansLeft % 3)*80;
+            }
+            else
+            {
+              this.x = stageWidth*(stage+1) + Crafty.math.randomInt(1,5)*200;
+            }
             this.y = 11*32;
             this.state.dead = false;
             this.state.walking = true;
@@ -248,6 +264,7 @@ function initializeEnemyComponents()
           if ( !(this.first && this.x < 650)) //little hack for stoping the first indian
           {
             this.x += this.movement.x;
+            if (stage == 3) this.x += this.movement.x;
           }
           else
           {

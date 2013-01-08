@@ -1,24 +1,11 @@
 function initializeEnemyComponents()
 {
-  //   EEEEENEMYY
   Crafty.c('Enemy', {
     init: function()
     {
-      //setup animations
-      this.saidMsg = null;
-      this.requires('SpriteAnimation')
-      .attr('attackCounter', 150)
-      .bind('EnterFrame', function ()
-      {
-          this.attackCounter++;
-          if (this.attackCounter > 50)
-          {
-            //if (this.isDown('SPACE')) this.attack();
-          }
-      })
-      
-      .attr('life', 1)
-      .bind('Hit',
+      this
+        .attr({'attackCounter': 150, 'life': 1, 'saidMsg': null})
+        .bind('Hit',
         function ()
         {
           if(!this.state.dying && !this.state.dead)
@@ -34,22 +21,19 @@ function initializeEnemyComponents()
                 this.state[ztate] = false;
               }
               this.state.dying = true;
-              this.setTweenProperties(0, 80, 50);
               this.stop();
+
+              this.setTweenProperties(0, 80, 50);
               createBlood(this.x + this.w/2, this.y+60);
               Crafty.audio.play("hurt");
 
-              killedIndians++;
-              if (stage == 3)
-              {
-                indiansLeft--;
-                finalText.text('The forest is destroyed. Now you just need to kill the ' +indiansLeft+' men left and go home');
-              }
+              player.indianKilled();
+
               if (this.first)
               {
                 this.first = false;
-                createNative(38,11);
-                createNative(40,11);
+                indians.push(createNative(38,11));
+                indians.push(createNative(40,11));
               }
             }
           }
@@ -63,19 +47,21 @@ function initializeEnemyComponents()
       this.state.walking = false;
       this.state.attacking = true;
       this.counter.attacking = 0;
-      if (this.calculateDistanceFromPlayer() >= 0)
+      if (this.facingRight)
       {
+        //attack to the right
         this.stop().animate('attackRight', 20, 0);
         this.axe.x = this.x + this.w/2 + 11;
         this.axe.y = this.y + this.h/2 - 24;
       }
       else
       {
+        //attack to the left
         this.stop().animate('attackLeft', 20, 0);
         this.axe.x = this.x + this.w/2 - 11 - this.axe.w;
         this.axe.y = this.y + this.h/2 - 24;
       }
-      
+
       var playersHit = this.axe.hit('joe');
       if(playersHit)
       {
@@ -87,7 +73,7 @@ function initializeEnemyComponents()
       this.counter.backing = 0;
       this.state.backing = true;
 
-      if (this.calculateDistanceFromPlayer() >= 0)
+      if (this.facingRight)
       {
         this.movement.x = -4;
       }
@@ -96,7 +82,7 @@ function initializeEnemyComponents()
         this.movement.x = 4;
       }
     },
-    calculateDistanceFromPlayer: function()
+    calculateDistanceFromTarget: function()
     {
       var targetX = player.x+player.w/2;
       var distanceX = targetX - (this.x + this.w/2);
@@ -106,21 +92,19 @@ function initializeEnemyComponents()
     });
 
 
-    
-    
     Crafty.c('NativeTypeAxe',{
-      
+
     init: function()
     {
-      this.movement = { x: 0};
-      this.first = false;
-      this.backingCounter = 0;
-      this.state = {walking: true, attacking: false, backing: false, crossing: false, dying: false, dead: false};
-      this.counter = {walking: 100, attacking:0, backing:0, crossing:0};
-      this.requires('Collision')
+      this.
+      attr({'movement': { x: 0}, 'first': false, 'backingCounter': 0,
+            'state': {walking: true, attacking: false, backing: false, crossing: false, dying: false, dead: false},
+            'counter': {walking: 100, attacking:0, backing:0, crossing:0},
+            'animationSpeed':100, 'nextThinking':10
+      })
+      .requires('Collision')
       .animate('attackRight', 0, 2, 1)
       .animate('attackLeft', 0, 3, 1)
-      .attr({animationSpeed:100, nextThinking:10})
       .bind('EnterFrame', function ()
       {
         if (this.state.crossing)
@@ -152,13 +136,14 @@ function initializeEnemyComponents()
           {
             this.rotation = 0;
             this.alpha = 1;
+
             if (stage == 2)
             {
               this.x = stageWidth*2 - Crafty.math.randomInt(1,5)*150;
             }
-            if (stage == 3)
+            else if (stage == 3)
             {
-              this.x = stageWidth*4 + (indiansLeft % 3)*80;
+              this.x = stageWidth*4 + (killedIndians % 3)*80;
             }
             else
             {
@@ -167,6 +152,8 @@ function initializeEnemyComponents()
             this.y = 11*32;
             this.state.dead = false;
             this.state.walking = true;
+            
+            if (indiansToKill <= 0) this.destroy();
           }
         }
         if (this.state.attacking)
@@ -196,9 +183,9 @@ function initializeEnemyComponents()
         {
           this.counter.walking++;      //this flag is a delay for the re-routing
           if (this.counter.walking > this.nextThinking)      //follow the player:
-          {
+          {      
             var randomNumber = Crafty.math.randomInt(1,10);
-            var distanceX = this.calculateDistanceFromPlayer();
+            var distanceX = this.calculateDistanceFromTarget();
 
             //define different speeds according to the distance
             var distanceLimit = 100;
@@ -270,7 +257,9 @@ function initializeEnemyComponents()
           {
             if (!this.saidMsg)
             {
-              showText(this, "What are you doing?");
+              createText(this, "What are you doing?")
+                .attr('timeLimit', 50);
+              nextMsgTime = dialog.lastMsgTime + 1500 + Crafty.math.randomInt(100,500);
               this.saidMsg = true;
 
             }

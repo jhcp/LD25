@@ -20,8 +20,6 @@ var map1 =
     {'x': 66*tileSize, 'y':1, 'type':3},
     {'x': 70*tileSize, 'y':1, 'type':1},
     {'x': 72*tileSize, 'y':1, 'type':1},
-    //{'x': 40*tileSize, 'y':101, 'type':1},
   ]
-}
-
+};
 map1.size = stageWidth*map1.stages;

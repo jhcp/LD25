@@ -5,12 +5,11 @@ function initializeGameComponents()
   {
     init: function()
     {
-      this.facingRight = true;
-      //setup animations
-      this.requires('SpriteAnimation')
+      this
+      .attr('facingRight', true)
+      .requires('SpriteAnimation')
       .animate('walk_left', 0, 1, 1)
       .animate('walk_right', 0, 0, 1)
-
       .bind('NewDirection',
         function (direction)
         {
@@ -32,7 +31,7 @@ function initializeGameComponents()
           }
         });
     }});
-    
+
   Crafty.c('Player',
   {
     init: function()
@@ -45,15 +44,37 @@ function initializeGameComponents()
           this.life--;
           changeLife(this.life);
           Crafty.audio.play("playerHurt");
-          
+
           if (this.life==0)  //die
           {
-            this.tween({'alpha':0}, 150);
-            Crafty.e('2D, DOM, Text')
-              .attr({ w: 220, h: 120, x: this.x-55, y: this.y-50, z:2001 })
-              .text('You died. Press 5 to start over');
+            this.tween({'alpha':0}, 30);
+            if (indiansToKill>0)
+            {
+              Crafty.e('2D, DOM, Text')
+                .attr({ w: 220, h: 120, x: this.x-55, y: this.y-50, z:2001 })
+                .text('You died. Press 5 to start over');
+            }
+            else
+            {
+              Crafty.e('2D, DOM, Text, Tween')
+                .attr({ w: 220, h: 120, x: stageWidth*3+300, y: this.y-50, z:2001, alpha:0 })
+                .text('Oopsie. You can\'t beat nature')
+                .tween({'alpha': 1}, 200);
+		  Crafty('nextStageArrow').each(function() { this.destroy(); });
+            }
           }
-        });
+        })
+	  .bind('Moved', function(from)
+	  {
+	    if(this.x < (832 * (stage) - 53)  && this.x<from.x)
+	    {
+		  this.attr({x: from.x, y:from.y});
+	    }
+	    else if(this.x>from.x && this.x > ( 832 * (stage+1) - 74) )
+	    {
+		  this.attr({x: from.x, y:from.y});
+	    }
+	  });
     }});
 
   //   AAAAAAAAAAXEEEEEEEEEEE
@@ -67,6 +88,15 @@ function initializeGameComponents()
 
       .requires('Keyboard')
       .attr('attackCounter', 150)
+      /*.bind('KeyDown', function (e)
+      {
+            if (e.key == Crafty.keys['S'])
+            {
+              this.addComponent('WiredHitBox');
+              Crafty('Enemy').each(function(){this.addComponent('SolidHitBox');});
+              Crafty('Tree').each(function(){this.addComponent('SolidHitBox');this.draw();});
+            }
+      })*/
       .bind('EnterFrame', function ()
       {
           this.attackCounter++;
@@ -74,7 +104,7 @@ function initializeGameComponents()
           {
             if (this.isDown('SPACE')) this.attack();
           }
-          
+
           if (this.isDown('5') || this.isDown('NUMPAD_5')) Crafty.scene('title');
       })
       ;
@@ -115,15 +145,11 @@ function initializeGameComponents()
 
     //  TREEEEEEEE
     Crafty.c('Tree', {
-    setFirst: function()
-    {
-      this.isFirst = true;
-    },
     init: function()
     {
       this
-        .attr('life', 3)
-        .attr('isFirst', false)
+        .attr('life', 1)
+        .attr('treeType', 1)
         .attr('isLast', false)
         .attr('hitCounter', 50)
         .attr('bouncing', false)
@@ -144,7 +170,7 @@ function initializeGameComponents()
           if (this.falling)
           {
             this.rotation = this.easeOutBounce();
-            if (!this.isFirst) this.y -=0.7;
+            if (!this.isFirst) this.y -=0.4;
             if (!this.isFirst) this.x +=0.2;
             if (!this.isFirst) this.z -=1;
             this.tweenProperties.timeCounter++;
@@ -171,7 +197,7 @@ function initializeGameComponents()
               {
                 if (this.tweenProperties.timeCounter == 66)
                   Crafty.audio.play("treeFall");
-  
+
                 Crafty("Ape").each(function() { this.y -= 1.5; });
                 if (this.tweenProperties.timeCounter % 20 == 0)
                 {
@@ -184,9 +210,9 @@ function initializeGameComponents()
                 document.getElementById('pointsHUD').style.marginTop = marginTop + 'px';
               }
             }
-            else if (this.isFirst && this.tweenProperties.timeCounter > 250 && this.tweenProperties.timeCounter < 340)
+            else if (this.isFirst && this.tweenProperties.timeCounter > 150 && this.tweenProperties.timeCounter < 240)
             {
-              if (this.tweenProperties.timeCounter == 254)
+              if (this.tweenProperties.timeCounter == 154)
                 Crafty.audio.play("treeFall");
 
               Crafty("Ape").each(function() { this.y -= 1.5; });
@@ -221,9 +247,9 @@ function initializeGameComponents()
               {
                 if (this.isFirst)
                 {
-                  this.setTweenProperties(0, 80, 650);
+                  this.setTweenProperties(0, 80, 400);
                   this.collision([140,250], [160,150], [160,305], [140,305]);
-                  createNative(25, 11, true);
+                  createNative(25, 11).first = true;
                 }
                 else if (this.isLast)
                 {
@@ -233,12 +259,12 @@ function initializeGameComponents()
                 else if (directionRight)
                 {
                   this.setTweenProperties(0, 80, 150);
-                  this.collision([140,250], [160,150], [160,305], [140,305]);
+                  this.collision([140,300], [160,230], [160,405], [140,405]);
                 }
                 else
                 {
                   this.setTweenProperties(0, -80, 150);
-                  this.collision([90,150], [110,250], [110,305], [90,305]);
+                  this.collision([90,230], [110,300], [110,405], [90,405]);
                 }
                 this.falling = true;
 
@@ -248,7 +274,7 @@ function initializeGameComponents()
           })
         ;
     }});
-    
+
     // TTTTTTTTTWEENABLE
     Crafty.c('Tweenable', {
     init: function()
@@ -324,23 +350,20 @@ function initializeGameComponents()
       this.stage = [];
       for(var i=0;i<map1.stages;i++) this.stage[i] = {completed: false};
 
+      this.lastTreeCreated = false;
       this
       .bind('EnterFrame',
         function ()
         {
           //handle the messages
-          if (dialog != null && (Crafty.frame() - lastMsgTimer) > 150)
-          {
-            dialog.destroy();
-            dialog = null;
-          }
-          else if (nextMsgTime > 0 && Crafty.frame() > nextMsgTime)
+          if (nextMsgTime > 0 && Crafty.frame() > nextMsgTime)
           {
             for (var i=0;i<indians.length;i++)
             {
               if (indians[i].x < stageWidth*(stage+1)-150)
               {
-                 showText(indians[i], insults[Crafty.math.randomInt(0, insults.length-1)]);
+                 createText(indians[i], insults[Crafty.math.randomInt(0, insults.length-1)]);
+                 nextMsgTime = dialog.lastMsgTime + 1500 + Crafty.math.randomInt(100,500);
                  break;
               }
             }
@@ -354,35 +377,38 @@ function initializeGameComponents()
               createArrow();
               this.stage[0].completed = true;
             }
-            else if ( !this.stage[1].completed && (points == 7) )  //7
+            else if ( !this.stage[1].completed && (points == 2) )  //7
             {
-              createArrow(); console.log('fim stage 2');
+              createArrow();
               this.stage[1].completed = true;
             }
-            else if ( !this.stage[2].completed && (points == 14) )    //14
+            else if ( !this.stage[2].completed && (points == 3) )    //14
             {
-              createArrow(); console.log('fim stage 3');
+              createArrow();
               this.stage[2].completed = true;
-              
+
               finalText = Crafty.e('2D, DOM, Text')
               .attr({ w: 400, h: 220, x: stageWidth*3+200, y: 50, z:2001 })
-              .text('The forest is destroyed. Now you just need to kill the 20 men left and go home');
-              
-              indiansLeft = 20;
-
+              .text('The forest is destroyed. Now you just need to kill the '+indiansToKill+' men left and go home');
+              killedIndians = 0;
             }
-            else if ( !this.stage[3].completed && (indiansLeft == 0) )    //14
+            else if ( !this.stage[3].completed && (indiansToKill == 0) )    //14
             {
-              createArrow(); console.log('fim stage 4');
+              createArrow();
+		  console.log('fim stage 4');
               this.stage[3].completed = true;
             }
             else if ( stage < 4 && this.stage[stage].completed
-                      && player.x > (stageWidth)*(stage+1)-150)
+                      && player.x > (stageWidth)*(stage+1)-100)
             {
-              if (stage==3 && !lastTreeCreated)
+              if (stage==3 && !this.lastTreeCreated && player.life > 0)
               {
-                 createTree(stageWidth*4, 1, 1, 40);
-                 lastTreeCreated = true;
+                 var lastTree = createTree(stageWidth*4, 1, 3, 40);
+                 lastTree.life = 1;
+                 lastTree.isLast = true;
+                 lastTree.trigger('Hit', false);
+                 this.lastTreeCreated = true;
+
                  player.life = 1;
                  player.trigger('Hit');
                  player.z = 100;
@@ -392,21 +418,40 @@ function initializeGameComponents()
                 if (stage!=3)
                 {
                   Crafty.viewport.pan('x', stageWidth, 50);
-                  player.tween({x: (stageWidth)*(stage+1)+50}, 45);
+
+                  //player.tween({x: (stageWidth)*(stage+1)+50}, 45);
+                  //player.x = (stageWidth)*(stage+1)+10;
                   stage++;
-                  Crafty('blood').each(function() { this.destroy(); });
+                  Crafty('Blood').each(function() { this.destroy(); });
                 }
               }
             }
           }
         });
-    }});
+    },
+    indianKilled: function()
+    {
+      killedIndians++;
+      if (stage == 3)
+      {
+         if (indiansToKill > 0)
+         {
+           indiansToKill--;
+           if (indiansToKill > 1) finalText.text('The forest is destroyed. Now you just need to kill the ' +indiansToKill+' men left and go home');
+           else finalText.text('The forest is destroyed. Now you just need to kill the ' +indiansToKill+' man left and go home');
+         }
+         else
+         {
+           finalText.destroy();
+         }
+      }
+    }
+    });
 
-    Crafty.c('Blinker',
+    Crafty.c('Blink',
     {
       init: function()
       {
-        this.visible = true;
         this.rate = 10;
         this.bind('EnterFrame', function()
         {
@@ -417,14 +462,20 @@ function initializeGameComponents()
         });
       }
     });
-};
 
-function endOfTween(tweenedEntity)
-{
-  tweenedEntity.trigger('RemoveComponent', tweenedEntity);
-};
-function endOfTreeFall(tree)
-{
-  endOfTween(tree);
-  tree.addTween({alpha: 0}, 'easeOutQuad', 80, endOfTween, [tree]);
+    Crafty.c('TimedDialog',
+    {
+      init: function()
+      {
+        this.lastMsgTime = Crafty.frame();
+        this.timeLimit = 250;
+        this.bind('EnterFrame', function()
+        {
+          if (Crafty.frame() - this.lastMsgTime > this.timeLimit)
+          {
+            this.destroy();
+          }
+        });
+      }
+    });
 };

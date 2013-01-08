@@ -32,8 +32,8 @@ function initializeEnemyComponents()
               if (this.first)
               {
                 this.first = false;
-                indians.push(createNative(38,11));
-                indians.push(createNative(40,11));
+                indians.push(createNative(49,11));
+                indians.push(createNative(47,11));
               }
             }
           }

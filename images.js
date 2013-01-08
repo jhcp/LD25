@@ -7,8 +7,7 @@ var images =
   'blood': 'assets/images/blood.png',
   'title': 'assets/images/title.png',
   'bg': 'assets/images/bg.png'
-};           //todo check if it's possible to use indexed arrays in javascript
-//todo check if it's possible to convert object to array
+};
 
 function getImagesToLoad()
 {

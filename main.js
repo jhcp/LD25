@@ -62,7 +62,6 @@ function generateLevel()
 window.onload = function ()
 {
   Crafty.init(stageWidth, stageHeight);
-  Crafty.canvas.init();//todo tirar isso
   setupImages();
   initializeGameComponents();
   initializeEnemyComponents();
@@ -70,11 +69,17 @@ window.onload = function ()
 
   //todo check if the audio files can be loaded with the load function
   //using names as .add, instead of using the files
-  Crafty.audio.add("chop", "assets/audio/chop.ogg");
-  Crafty.audio.add("playerHurt", "assets/audio/6.ogg");
-  Crafty.audio.add("hurt", "assets/audio/randomize12.ogg");
-  Crafty.audio.add("treeFall", "assets/audio/explosion3.ogg");
-  Crafty.audio.add("go", "assets/audio/8repeat.ogg");
+  var sounds = 
+	{
+	  'chop': 'assets/audio/chop.ogg',
+	  'playerHurt': 'assets/audio/6.ogg',
+	  'hurt': 'assets/audio/randomize12.ogg',
+	  'treeFall': 'assets/audio/explosion3.ogg',
+	  'go': 'assets/audio/8repeat.ogg'
+	};
+  var assets = new Array();
+  for (image in images) assets.push(images[image]);
+  for (sound in sounds) assets.push(sounds[sound]);
 
   Crafty.scene('loading', function ()
   {
@@ -84,9 +89,15 @@ window.onload = function ()
       .text('Loading...')
       .css({ 'text-align': 'center' });
 
-    Crafty.load(getImagesToLoad(), function ()
+    Crafty.load(assets, function ()
     {
       setupImages();
+	Crafty.audio.add("chop", "assets/audio/chop.ogg");
+	Crafty.audio.add("playerHurt", "assets/audio/6.ogg");
+	Crafty.audio.add("hurt", "assets/audio/randomize12.ogg");
+	Crafty.audio.add("treeFall", "assets/audio/explosion3.ogg");
+	Crafty.audio.add("go", "assets/audio/8repeat.ogg");
+	
       loadingText.destroy();
 
       Crafty.scene('title');

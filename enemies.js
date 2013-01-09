@@ -248,7 +248,7 @@ function initializeEnemyComponents()
           }
 
           //the actual movement
-          if ( !(this.first && this.x < 650)) //little hack for stoping the first indian
+          if ( !(this.first && this.x < 600)) //little hack for stoping the first indian
           {
             this.x += this.movement.x;
             if (stage == 3) this.x += this.movement.x;

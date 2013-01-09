@@ -33,12 +33,12 @@ function reset()
   stage = 0;
   points = 0;
   killedIndians = 0;
-  indiansToKill = 5;
+  indiansToKill = 20;
   dialog = null;
   nextMsgTime = -1;
 
   pointsHUD.innerHTML = 0;
-  lifeHUD.innerHTML = 10;
+  lifeHUD.innerHTML = 5;
   boundaryLeft = -30;
   boundaryRight = stageWidth;
 }
@@ -75,7 +75,8 @@ window.onload = function ()
 	  'playerHurt': 'assets/audio/6.ogg',
 	  'hurt': 'assets/audio/randomize12.ogg',
 	  'treeFall': 'assets/audio/explosion3.ogg',
-	  'go': 'assets/audio/8repeat.ogg'
+	  'go': 'assets/audio/8repeat.ogg',
+	  'music': 'assets/audio/first.ogg'
 	};
   var assets = new Array();
   for (image in images) assets.push(images[image]);
@@ -97,6 +98,8 @@ window.onload = function ()
 	Crafty.audio.add("hurt", "assets/audio/randomize12.ogg");
 	Crafty.audio.add("treeFall", "assets/audio/explosion3.ogg");
 	Crafty.audio.add("go", "assets/audio/8repeat.ogg");
+	
+	Crafty.audio.add("music", "assets/audio/first.ogg");
 	
       loadingText.destroy();
 
@@ -136,6 +139,7 @@ window.onload = function ()
   Crafty.scene('level1', function ()
   {
     Crafty.background('url("assets/images/bg.png")');
+    Crafty.audio.play("music", -1, 0.6);
     generateLevel();
     createPlayer(3,11);
   });

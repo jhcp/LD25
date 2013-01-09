@@ -36,7 +36,7 @@ function initializeGameComponents()
   {
     init: function()
     {
-      this.life = 10;
+      this.life = 5;
       this
       .bind('Hit',
         function ()
@@ -57,8 +57,12 @@ function initializeGameComponents()
             else
             {
               Crafty.e('2D, DOM, Text, Tween')
-                .attr({ w: 220, h: 120, x: stageWidth*3+300, y: this.y-50, z:2001, alpha:0 })
+                .attr({alpha:0, w: 220, h: 120, x: stageWidth*3+300, y: this.y-50, z:2001 })
                 .text('Oopsie. You can\'t beat nature')
+                .tween({'alpha': 1}, 200);
+		  Crafty.e('2D, DOM, Text, Tween')
+                .attr({alpha:0, w: 220, h: 120, x: stageWidth*3+300, y: this.y, z:2001 })
+                .text('THE END')
                 .tween({'alpha': 1}, 200);
 		  Crafty('nextStageArrow').each(function() { this.destroy(); });
             }
@@ -66,14 +70,26 @@ function initializeGameComponents()
         })
 	  .bind('Moved', function(from)
 	  {
-	    if(this.x < (832 * (stage) - 53)  && this.x<from.x)
+	    if (this.attackCounter < 20)
 	    {
-		  this.attr({x: from.x, y:from.y});
+	      this.attr({x: from.x, y:from.y});
 	    }
-	    else if(this.x>from.x && this.x > ( 832 * (stage+1) - 74) )
+	    else
 	    {
-		  this.attr({x: from.x, y:from.y});
-	    }
+		    if(this.x < (832 * (stage) - 53)  && this.x<from.x)
+		    {
+			  this.attr({x: from.x, y:from.y});
+		    }
+		    else if(this.x>from.x && this.x > ( 832 * (stage+1) - 74) )
+		    {
+			  this.attr({x: from.x, y:from.y});
+		    }
+		    
+		    if (this.x>from.x && !this.isPlaying('walk_right'))
+			  this.stop().animate('walk_right', 10, -1);
+		    else if (this.x<from.x && !this.isPlaying('walk_left'))
+			  this.stop().animate('walk_left', 10, -1);
+		}
 	  });
     }});
 
@@ -148,12 +164,13 @@ function initializeGameComponents()
     init: function()
     {
       this
-        .attr('life', 1)
+        .attr('life', 3)
         .attr('treeType', 1)
         .attr('isLast', false)
         .attr('hitCounter', 50)
         .attr('bouncing', false)
         .attr('falling', false)
+	  .attr('hurtsEnemies', true)
         .bind('EnterFrame', function ()
         {
           this.hitCounter++;
@@ -176,7 +193,7 @@ function initializeGameComponents()
             this.tweenProperties.timeCounter++;
 
             var enemiesHit = this.hit('Enemy');
-            if(enemiesHit)
+            if(enemiesHit && this.hurtsEnemies)
             {
               for(var i=0;i<enemiesHit.length;i++)
               {
@@ -208,12 +225,17 @@ function initializeGameComponents()
                   marginTop -= 5;
                 }
                 document.getElementById('pointsHUD').style.marginTop = marginTop + 'px';
+		    
+		    this.hurtsEnemies = false;
               }
             }
-            else if (this.isFirst && this.tweenProperties.timeCounter > 150 && this.tweenProperties.timeCounter < 240)
+            else if (this.isFirst && this.tweenProperties.timeCounter > 250 && this.tweenProperties.timeCounter < 340)
             {
-              if (this.tweenProperties.timeCounter == 154)
+              if (this.tweenProperties.timeCounter == 274)
                 Crafty.audio.play("treeFall");
+		    
+		  // if (this.tweenProperties.timeCounter == 230)
+                // Crafty.audio.play("music", -1, 0.6);
 
               Crafty("Ape").each(function() { this.y -= 1.5; });
               if (this.tweenProperties.timeCounter % 10 == 0)
@@ -225,6 +247,7 @@ function initializeGameComponents()
                 marginTop -= 5;
               }
               document.getElementById('pointsHUD').style.marginTop = marginTop + 'px';
+		  this.hurtsEnemies = false;
             }
           }
         })
@@ -247,7 +270,7 @@ function initializeGameComponents()
               {
                 if (this.isFirst)
                 {
-                  this.setTweenProperties(0, 80, 400);
+                  this.setTweenProperties(0, 80, 700);
                   this.collision([140,250], [160,150], [160,305], [140,305]);
                   createNative(25, 11).first = true;
                 }
@@ -377,12 +400,12 @@ function initializeGameComponents()
               createArrow();
               this.stage[0].completed = true;
             }
-            else if ( !this.stage[1].completed && (points == 2) )  //7
+            else if ( !this.stage[1].completed && (points == 7) )  //7
             {
               createArrow();
               this.stage[1].completed = true;
             }
-            else if ( !this.stage[2].completed && (points == 3) )    //14
+            else if ( !this.stage[2].completed && (points == 14) )    //14
             {
               createArrow();
               this.stage[2].completed = true;

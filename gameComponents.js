@@ -41,7 +41,7 @@ function initializeGameComponents()
       .bind('Hit',
         function ()
         {
-          this.life--;
+          if (this.life> 0) this.life--;
           changeLife(this.life);
           Crafty.audio.play("playerHurt");
 

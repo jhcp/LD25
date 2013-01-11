@@ -37,35 +37,42 @@ function initializeGameComponents()
     init: function()
     {
       this.life = 5;
+	this.dead = false;
       this
       .bind('Hit',
         function ()
         {
-          if (this.life> 0) this.life--;
+          if (this.dead == false) this.life--;
           changeLife(this.life);
           Crafty.audio.play("playerHurt");
 
-          if (this.life==0)  //die
+          if (this.life<=0)  //die
           {
-            this.tween({'alpha':0}, 30);
-            if (indiansToKill>0)
-            {
-              Crafty.e('2D, DOM, Text')
-                .attr({ w: 220, h: 120, x: this.x-55, y: this.y-50, z:2001 })
-                .text('You died. Press 5 to start over');
-            }
-            else
-            {
-              Crafty.e('2D, DOM, Text, Tween')
-                .attr({alpha:0, w: 220, h: 120, x: stageWidth*3+300, y: this.y-50, z:2001 })
-                .text('Oopsie. You can\'t beat nature')
-                .tween({'alpha': 1}, 200);
-		  Crafty.e('2D, DOM, Text, Tween')
-                .attr({alpha:0, w: 220, h: 120, x: stageWidth*3+300, y: this.y, z:2001 })
-                .text('THE END')
-                .tween({'alpha': 1}, 200);
-		  Crafty('nextStageArrow').each(function() { this.destroy(); });
-            }
+            if (this.dead == false)
+		{
+			this.tween({'alpha':0}, 30);
+			if (indiansToKill>0)
+			{
+			  Crafty.e('2D, DOM, Text')
+			    .attr({ w: 220, h: 120, x: this.x-55, y: this.y-50, z:2001 })
+			    .text('You died. Press 5 to start over');
+			    this.dead = true;
+			}
+			else
+			{              
+			  Crafty.e('2D, DOM, Text, Tween')
+			    .attr({alpha:0, w: 220, h: 120, x: stageWidth*3+300, y: this.y-50, z:2001 })
+			    .text('Ooops. You can\'t beat nature')
+			    .tween({'alpha': 1}, 200);
+			  Crafty.e('2D, DOM, Text, Tween')
+			    .attr({alpha:0, w: 220, h: 120, x: stageWidth*3+300, y: this.y, z:2001 })
+			    .text('THE END')
+			    .tween({'alpha': 1}, 200);
+			  Crafty('nextStageArrow').each(function() { this.destroy(); });
+			  
+			}
+		}
+		
           }
         })
 	  .bind('Moved', function(from)
@@ -424,17 +431,27 @@ function initializeGameComponents()
             else if ( stage < 4 && this.stage[stage].completed
                       && player.x > (stageWidth)*(stage+1)-100)
             {
-              if (stage==3 && !this.lastTreeCreated && player.life > 0)
+              if (stage==3 && !this.lastTreeCreated)
               {
-                 var lastTree = createTree(stageWidth*4, 1, 3, 40);
-                 lastTree.life = 1;
-                 lastTree.isLast = true;
-                 lastTree.trigger('Hit', false);
-                 this.lastTreeCreated = true;
+                 if (player.life > 0)
+		     {
+			     var lastTree = createTree(stageWidth*4, 1, 3, 40);
+			     lastTree.life = 1;
+			     lastTree.isLast = true;
+			     lastTree.trigger('Hit', false);
+			     this.lastTreeCreated = true;
 
-                 player.life = 1;
-                 player.trigger('Hit');
-                 player.z = 100;
+			     player.life = 1;
+			     player.trigger('Hit');
+			     player.z = 100;
+			}
+			else
+			{
+				Crafty.e('2D, DOM, Text, Tween')
+				    .attr({alpha:0, w: 220, h: 120, x: stageWidth*3+300, y: this.y-150, z:2001 })
+				    .text('Really?! you wanna finish the game after you\'re dead?')
+				    .tween({'alpha': 1}, 200);
+			}
               }
               else
               {

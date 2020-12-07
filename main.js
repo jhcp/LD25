@@ -25,6 +25,21 @@ var boundaryRight;
 var dialog = null;
 var nextMsgTime;
 
+function redefineCraftyKeys() {
+  // at some point of browsers evolution, Crafty's code for handling key presses has stopped working.
+  // this function redefines the key codes used on the game, based on current browsers (as of the year 2020)
+  Crafty.keys.SPACE = ' ';
+  Crafty.keys.ENTER = 'Enter';
+  Crafty.keys.UP_ARROW = 'ArrowUp';
+  Crafty.keys.DOWN_ARROW = 'ArrowDown';
+  Crafty.keys.LEFT_ARROW = 'ArrowLeft';
+  Crafty.keys.RIGHT_ARROW = 'ArrowRight';
+  Crafty.keys.NUMPAD_0 = '0';
+  Crafty.keys.W = 'W';
+  Crafty.keys.w = 'w';
+  Crafty.keys['5'] = '5';
+}
+
 function reset()
 {
   Crafty.viewport.x = 0;
@@ -66,6 +81,8 @@ window.onload = function ()
   initializeGameComponents();
   initializeEnemyComponents();
   Crafty.viewport.clampToEntities = false;
+  redefineCraftyKeys();
+
 
   //todo check if the audio files can be loaded with the load function
   //using names as .add, instead of using the files
@@ -128,7 +145,7 @@ window.onload = function ()
       .css({ 'color': 'white' })
       .bind('KeyDown', function(e)
       {
-        if(e.key == Crafty.keys['SPACE'])
+        if(e.key == Crafty.keys['SPACE'] || e.key == Crafty.keys['ENTER'])
         {
           Crafty.scene('level1');
         }
@@ -211,7 +228,6 @@ function createBlood(x, y)
   Crafty.e('2D, DOM, Tween, Blood, blood'+Crafty.math.randomInt(1,6))
     .attr({ x: x, y: y, z:600, h:1 })
     .tween({h: 30}, 65);
-    ;
 }
 
 function increasePoints(x)

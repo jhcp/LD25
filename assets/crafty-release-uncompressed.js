@@ -6783,7 +6783,9 @@ Crafty.c("Twoway", {
 			RIGHT_ARROW: 0,
 			LEFT_ARROW: 180,
 			D: 0,
+			d: 0,
 			A: 180,
+			a: 180,
 			Q: 180
 		});
 
@@ -6797,7 +6799,7 @@ Crafty.c("Twoway", {
 				this._falling = true;
 			}
 		}).bind("KeyDown", function () {
-			if (this.isDown("UP_ARROW") || this.isDown("W") || this.isDown("Z")) this._up = true;
+			if (this.isDown("UP_ARROW") || this.isDown("w") || this.isDown("W") || this.isDown("Z")) this._up = true;
 		});
 
 		return this;

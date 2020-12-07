@@ -281,15 +281,12 @@ var insults =
   "Are you insane?",
   "How do you do (do you do) the things that you do?",
   "Why are you doing this?",
-  "So, you like wood, I see...",
   "You make me sick",
-  "In the name of progress, I know",
-  "What's that in your pocket? Oh...",
+  "All in the name of progress, right?",
   "OMG, where are your eyes?!??",
   "Me... kill... you",
   "You killed my family!!",
-  "Are you the evil guy people 've been talking about?",
   "You're a lumberjack? But where's your beard!?",
-  "Hunf",
-  "Is it worthy?"
+  "Hmph",
+  "Is it worthy, destroying nature?"
 ];

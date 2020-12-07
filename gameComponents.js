@@ -62,7 +62,7 @@ function initializeGameComponents()
 			{              
 			  Crafty.e('2D, DOM, Text, Tween')
 			    .attr({alpha:0, w: 220, h: 120, x: stageWidth*3+300, y: this.y-50, z:2001 })
-			    .text('Ooops. You can\'t beat nature')
+			    .text('Ooops. It turns out you can\'t beat nature, after all')
 			    .tween({'alpha': 1}, 200);
 			  Crafty.e('2D, DOM, Text, Tween')
 			    .attr({alpha:0, w: 220, h: 120, x: stageWidth*3+300, y: this.y, z:2001 })
@@ -419,7 +419,7 @@ function initializeGameComponents()
 
               finalText = Crafty.e('2D, DOM, Text')
               .attr({ w: 400, h: 220, x: stageWidth*3+200, y: 50, z:2001 })
-              .text('The forest is destroyed. Now you just need to kill the '+indiansToKill+' men left and go home');
+              .text('The forest is destroyed. Now you just need to kill the '+indiansToKill+' defenders left and go home');
               killedIndians = 0;
             }
             else if ( !this.stage[3].completed && (indiansToKill == 0) )    //14
@@ -477,8 +477,8 @@ function initializeGameComponents()
          if (indiansToKill > 0)
          {
            indiansToKill--;
-           if (indiansToKill > 1) finalText.text('The forest is destroyed. Now you just need to kill the ' +indiansToKill+' men left and go home');
-           else finalText.text('The forest is destroyed. Now you just need to kill the ' +indiansToKill+' man left and go home');
+           if (indiansToKill > 1) finalText.text('The forest is destroyed. Now you just need to kill the ' +indiansToKill+' defenders left and go home');
+           else finalText.text('The forest is destroyed. Now you just need to kill the ' +indiansToKill+' defender left and go home');
          }
          else
          {
